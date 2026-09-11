@@ -6,7 +6,7 @@
 // --- DEPLOYMENT CONFIGURATION ------------------------------------------------
 // Dynamically select the backend URL based on the environment
 // -----------------------------------------------------------------------------
-const PROJECT_ID = "victoryspring-681e5";
+const PROJECT_ID = "resolute-92775";
 const REGION = "us-central1";
 
 // The live Firebase Cloud Run URL (as returned by the deployment)
