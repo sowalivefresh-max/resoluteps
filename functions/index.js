@@ -142,6 +142,7 @@ app.get('/api/debug-subjects', async (req, res) => {
     res.json({error: e.message});
   }
 });
+
 app.post("/api", async (req, res) => {
   let action = req.body.action;
   if (!action) return res.status(400).json({ success: false, message: "No action specified." });
