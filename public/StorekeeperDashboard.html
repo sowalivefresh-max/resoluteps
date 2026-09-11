@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="manifest" href="manifest.json" />
+    <meta name="theme-color" content="#0a192f" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <link rel="apple-touch-icon" href="icon.png" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Store Keeper Dashboard</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="aa-layout">
+    <div class="aa-sidebar-overlay" id="aa-sidebar-overlay"></div>
+    <aside class="aa-sidebar" id="aa-sidebar">
+      <div class="aa-sidebar-brand">
+        <div class="aa-brand-icon">SK</div>
+        <div class="aa-brand-text">
+          <div class="aa-brand-name" id="sb-school-name">Loading…</div>
+          <div class="aa-brand-role">Store Keeper</div>
+        </div>
+      </div>
+      <nav class="aa-nav">
+        <div class="aa-nav-section">Main</div>
+        <button class="aa-nav-item active" id="nav-dashboard" onclick="switchTab('store-tabs', 'tab-dashboard'); setActiveNav('nav-dashboard')">
+          <i class="fa fa-chart-pie"></i> Dashboard
+        </button>
+        <div class="aa-nav-section">Store Management</div>
+        <button class="aa-nav-item" id="nav-inventory" onclick="switchTab('store-tabs', 'tab-inventory'); setActiveNav('nav-inventory'); loadInventory();">
+          <i class="fa fa-boxes"></i> Inventory
+        </button>
+        <button class="aa-nav-item" id="nav-issue" onclick="switchTab('store-tabs', 'tab-issue'); setActiveNav('nav-issue'); loadStudents();">
+          <i class="fa fa-hand-holding"></i> Issue Item
+        </button>
+        <button class="aa-nav-item" id="nav-orders" onclick="switchTab('store-tabs', 'tab-orders'); setActiveNav('nav-orders'); loadPaidOrders();">
+          <i class="fa fa-clipboard-check"></i> Paid Orders
+        </button>
+        <button class="aa-nav-item" id="nav-records" onclick="switchTab('store-tabs', 'tab-records'); setActiveNav('nav-records'); loadRecords();">
+          <i class="fa fa-history"></i> Issuance Records
+        </button>
+        <div class="aa-nav-section">Account</div>
+        <button class="aa-nav-item text-danger" onclick="AA.logout()">
+          <i class="fa fa-sign-out-alt"></i> Logout
+        </button>
+      </nav>
+      <div class="aa-sidebar-footer">
+        <div class="aa-user-card" onclick="AA.populateProfileModal()">
+          <div class="aa-user-avatar">SK</div>
+          <div>
+            <div class="aa-user-name" id="profDisplayName">Loading...</div>
+            <div class="aa-user-role">Store Keeper</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <main class="aa-main">
+      <header class="aa-topbar">
+        <button class="aa-menu-toggle" id="aa-menu-toggle"><i class="fa fa-bars"></i></button>
+        <div class="aa-topbar-left">
+          <div class="aa-topbar-title">Store Keeper Dashboard</div>
+          <div class="aa-topbar-subtitle" id="currentTermText">Academic Session</div>
+        </div>
+        <div class="aa-topbar-right">
+          <button class="aa-btn aa-btn-outline" onclick="openReceiveModal()"><i class="fa fa-plus"></i> Receive Stock</button>
+        </div>
+      </header>
+
+      <div class="aa-content">
+        <div id="store-tabs" style="display:none;">
+          <div class="aa-tab active" data-tab="tab-dashboard" data-onload="loadDashboard"></div>
+          <div class="aa-tab" data-tab="tab-inventory" data-onload="loadInventory"></div>
+          <div class="aa-tab" data-tab="tab-issue" data-onload="loadStudents"></div>
+          <div class="aa-tab" data-tab="tab-orders" data-onload="loadPaidOrders"></div>
+          <div class="aa-tab" data-tab="tab-records" data-onload="loadRecords"></div>
+        </div>
+
+        <!-- TAB: Dashboard -->
+        <div class="aa-tab-content active" data-group="store-tabs" data-id="tab-dashboard">
+          <div class="aa-grid-3 mb-4">
+            <div class="aa-stat-card">
+              <div class="aa-stat-icon bg-info"><i class="fa fa-boxes"></i></div>
+              <div class="aa-stat-value" id="stat-total-items">-</div>
+              <div class="aa-stat-label">Total Unique Items</div>
+            </div>
+            <div class="aa-stat-card">
+              <div class="aa-stat-icon bg-warning"><i class="fa fa-exclamation-triangle"></i></div>
+              <div class="aa-stat-value" id="stat-low-stock">-</div>
+              <div class="aa-stat-label">Low Stock Items</div>
+            </div>
+            <div class="aa-stat-card">
+              <div class="aa-stat-icon bg-success"><i class="fa fa-check-circle"></i></div>
+              <div class="aa-stat-value" id="stat-pending-orders">-</div>
+              <div class="aa-stat-label">Paid Orders Pending</div>
+            </div>
+          </div>
+          <div class="aa-card">
+            <div class="aa-card-header">
+              <h3 class="aa-card-title">Recent Issuance Records</h3>
+            </div>
+            <div class="aa-card-body" style="padding:0;">
+              <table class="aa-table" id="recentRecordsTable">
+                <thead><tr><th>Date</th><th>Student</th><th>Item</th><th>Qty</th><th>Issued By</th></tr></thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB: Inventory -->
+        <div class="aa-tab-content" data-group="store-tabs" data-id="tab-inventory">
+          <div class="aa-card">
+            <div class="aa-card-header">
+              <h3 class="aa-card-title">Inventory</h3>
+              <div class="d-flex gap-2">
+                <button class="aa-btn aa-btn-primary" onclick="openReceiveModal()"><i class="fa fa-plus"></i> Add New Item</button>
+              </div>
+            </div>
+            <div class="aa-card-body" style="padding:0;">
+              <table class="aa-table" id="inventoryTable">
+                <thead><tr><th>Item Name</th><th>Category</th><th>Price (&#8358;)</th><th>Stock Level</th><th>Actions</th></tr></thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB: Issue Item -->
+        <div class="aa-tab-content" data-group="store-tabs" data-id="tab-issue">
+          <div class="aa-card">
+            <div class="aa-card-header">
+              <h3 class="aa-card-title">Issue Item to Student</h3>
+            </div>
+            <div class="aa-card-body">
+              <form id="issueForm" onsubmit="event.preventDefault(); submitIssueItem();">
+                <div class="aa-grid-2">
+                  <div class="aa-form-group">
+                    <label class="aa-label">Student (Select or Search)</label>
+                    <select id="issueStudentSelect" class="aa-select" required></select>
+                  </div>
+                  <div class="aa-form-group">
+                    <label class="aa-label">Item to Issue</label>
+                    <select id="issueItemSelect" class="aa-select" required></select>
+                  </div>
+                </div>
+                <div class="aa-grid-2">
+                  <div class="aa-form-group">
+                    <label class="aa-label">Quantity</label>
+                    <input type="number" id="issueQuantity" class="aa-input" min="1" value="1" required>
+                  </div>
+                  <div class="aa-form-group">
+                    <label class="aa-label">Note (Optional)</label>
+                    <input type="text" id="issueNote" class="aa-input" placeholder="e.g. Size L, Blue">
+                  </div>
+                </div>
+                <button type="submit" class="aa-btn aa-btn-success"><i class="fa fa-check"></i> Complete Issuance</button>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB: Paid Orders -->
+        <div class="aa-tab-content" data-group="store-tabs" data-id="tab-orders">
+          <div class="aa-card">
+            <div class="aa-card-header">
+              <h3 class="aa-card-title">Paid Items Pending Issuance</h3>
+              <p class="text-muted" style="margin: 0; font-size: 13px;">These items have been paid for via Accounts and are waiting to be issued.</p>
+            </div>
+            <div class="aa-card-body" style="padding:0;">
+              <table class="aa-table" id="ordersTable">
+                <thead><tr><th>Date</th><th>Student</th><th>Item</th><th>Qty</th><th>Status</th><th>Action</th></tr></thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB: Records -->
+        <div class="aa-tab-content" data-group="store-tabs" data-id="tab-records">
+          <div class="aa-card">
+            <div class="aa-card-header">
+              <h3 class="aa-card-title">All Issuance Records</h3>
+            </div>
+            <div class="aa-card-body" style="padding:0;">
+              <table class="aa-table" id="recordsTable">
+                <thead><tr><th>Date</th><th>Student</th><th>Item</th><th>Qty</th><th>Note</th><th>Issued By</th></tr></thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- Receive Stock Modal -->
+  <div class="aa-modal-backdrop" id="receiveModal">
+    <div class="aa-modal">
+      <div class="aa-modal-header">
+        <h5 class="aa-modal-title">Receive Stock / Add Item</h5>
+        <button class="aa-modal-close" onclick="closeModal('receiveModal')">×</button>
+      </div>
+      <div class="aa-modal-body">
+        <form id="receiveForm">
+          <input type="hidden" id="receiveItemId">
+          <div class="aa-form-group">
+            <label class="aa-label">Item Name</label>
+            <input type="text" id="receiveItemName" class="aa-input" required placeholder="e.g. School Uniform (Boy)">
+          </div>
+          <div class="aa-grid-2">
+            <div class="aa-form-group">
+              <label class="aa-label">Category</label>
+              <input type="text" id="receiveCategory" class="aa-input" required placeholder="e.g. Uniforms, Books">
+            </div>
+            <div class="aa-form-group">
+              <label class="aa-label">Unit Price (&#8358;)</label>
+              <input type="number" id="receivePrice" class="aa-input" min="0" value="0">
+            </div>
+          </div>
+          <div class="aa-grid-2">
+            <div class="aa-form-group">
+              <label class="aa-label">Quantity to Add</label>
+              <input type="number" id="receiveQuantity" class="aa-input" min="1" value="1" required>
+            </div>
+            <div class="aa-form-group">
+              <label class="aa-label">Section Applicability</label>
+              <select id="receiveSection" class="aa-select">
+                <option value="primary">Primary School</option>
+              </select>
+            </div>
+          </div>
+          <div class="aa-form-group">
+            <label class="aa-label">Size (Optional - for uniforms)</label>
+            <input type="text" id="receiveSize" class="aa-input" placeholder="e.g. Size 10, Medium">
+          </div>
+          <div class="d-flex justify-content-end mt-3 gap-2">
+            <button type="button" class="aa-btn aa-btn-outline" onclick="closeModal('receiveModal')">Cancel</button>
+            <button type="submit" class="aa-btn aa-btn-primary">Save Stock</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Profile Modal -->
+  <div class="aa-modal-backdrop" id="profileModal">
+    <!-- Similar to Accounts Dashboard -->
+    <div class="aa-modal">
+      <div class="aa-modal-header"><h5 class="aa-modal-title">My Profile</h5><button class="aa-modal-close" onclick="closeModal('profileModal')">×</button></div>
+      <div class="aa-modal-body">
+        <div class="text-center mb-4">
+          <div class="aa-user-name fs-20 fw-700 mt-2" id="profNameDisplay"></div>
+          <div class="aa-user-role text-muted fs-14">Store Keeper</div>
+        </div>
+        <div class="aa-form-group">
+          <label class="aa-label">Full Name</label>
+          <input type="text" id="profName" class="aa-input">
+        </div>
+        <div class="aa-form-group">
+          <label class="aa-label">Email Address</label>
+          <input type="email" id="profEmail" class="aa-input">
+        </div>
+        <div class="aa-form-group">
+          <label class="aa-label">Phone Number</label>
+          <input type="text" id="profPhone" class="aa-input">
+        </div>
+        <hr class="my-4" style="border:0;border-top:1px solid #eee;">
+        <h6 class="mb-3">Change Password</h6>
+        <div class="aa-form-group">
+          <label class="aa-label">Current Password</label>
+          <input type="password" id="oldPwd" class="aa-input" placeholder="Enter your current password">
+        </div>
+        <div class="aa-form-group">
+          <label class="aa-label">New Password</label>
+          <input type="password" id="newPwd" class="aa-input" placeholder="Min. 6 characters">
+        </div>
+        <div class="aa-form-group">
+          <label class="aa-label">Confirm New Password</label>
+          <input type="password" id="confirmPwd" class="aa-input" placeholder="Re-enter new password">
+        </div>
+        <div class="d-flex gap-2">
+          <button class="aa-btn aa-btn-outline w-100" onclick="AA.changePwd()">Update Password</button>
+          <button class="aa-btn aa-btn-primary w-100" onclick="AA.updateProfile()">Save Details</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="api.js?v=4"></script>
+  <script src="scripts.js?v=1788044468"></script>
+  <script>
+    var currentTerm = ''; var currentSession = '';
+    var globalInventory = [];
+    var globalStudents = [];
+
+    document.addEventListener('DOMContentLoaded', function() {
+      initTabs('store-tabs'); AA.init();
+      function initDashboard() {
+        if (!AA.user || !AA.settings || !AA.settings.current_term) return setTimeout(initDashboard, 100);
+        currentTerm = AA.settings.current_term; currentSession = AA.settings.current_session;
+        document.getElementById('currentTermText').textContent = currentTerm + ' - ' + currentSession;
+        
+        var uName = AA.user.fullName || AA.user.name || 'Store Keeper';
+        document.getElementById('profDisplayName').textContent = uName;
+        document.getElementById('profNameDisplay').textContent = uName;
+
+        loadDashboard();
+      }
+      initDashboard();
+    });
+
+    function getSection() {
+      var s = (AA.user && AA.user.section && AA.user.section !== 'both') ? AA.user.section : 'both';
+      if (s === 'secondary') s = 'high';
+      if (s === 'both' && AA.user && AA.user.institutionType && AA.user.institutionType !== 'both') {
+          s = AA.user.institutionType;
+      }
+      if (s === 'secondary') s = 'high';
+      return s;
+    }
+
+    function loadDashboard() {
+      var section = getSection();
+      callServer('storeGetInventory', [AA.token, section], function(items) {
+        globalInventory = items;
+        document.getElementById('stat-total-items').textContent = items.length;
+        var lowStock = items.filter(function(i) { return Number(i.stock || 0) < 10; }).length;
+        document.getElementById('stat-low-stock').textContent = lowStock;
+        
+        callServer('storeGetPaidItems', [AA.token, section], function(orders) {
+           document.getElementById('stat-pending-orders').textContent = orders.length;
+        });
+
+        callServer('storeGetRecords', [AA.token, section], function(records) {
+           var top = records.slice(0, 5);
+           buildTable('recentRecordsTable', [
+             {key:'date', render:function(r) { return new Date(r.date).toLocaleString(); }},
+             {key:'studentName'},
+             {key:'itemName'},
+             {key:'quantity'},
+             {key:'issuedBy'}
+           ], top);
+        });
+      }, null, true);
+    }
+
+    function loadInventory() {
+      var section = getSection();
+      callServer('storeGetInventory', [AA.token, section], function(items) {
+        globalInventory = items;
+        buildTable('inventoryTable', [
+          {key:'name', render: function(r){ return r.name + (r.size ? ' <small class="text-muted">('+r.size+')</small>' : ''); }},
+          {key:'category'},
+          {key:'price', render: function(r){ return formatNaira(r.price || 0); }},
+          {key:'stock', render: function(r){ 
+             var s = Number(r.stock || 0);
+             if(s < 10) return '<span class="text-danger fw-bold">'+s+' (Low)</span>';
+             return s;
+          }}
+        ], items, function(r) {
+           return '<div class="d-flex gap-2">' +
+                  '<button class="aa-btn aa-btn-outline aa-btn-xs" onclick="addStock(\''+r.id+'\', \''+r.name+'\', \''+r.category+'\', \''+r.price+'\', \''+r.section+'\')"><i class="fa fa-plus"></i> Stock</button>' +
+                  '<button class="aa-btn aa-btn-primary aa-btn-xs" onclick="editItem(\''+r.id+'\')"><i class="fa fa-edit"></i> Edit</button>' +
+                  '<button class="aa-btn aa-btn-danger aa-btn-xs" onclick="deleteItem(\''+r.id+'\')"><i class="fa fa-trash"></i></button>' +
+                  '</div>';
+        });
+
+        // Update issue item select dropdown
+        var sel = document.getElementById('issueItemSelect');
+        if(sel) {
+           sel.innerHTML = '<option value="">-- Select Item --</option>';
+           items.forEach(function(i){
+             sel.innerHTML += '<option value="'+i.id+'">'+i.name+' (Stock: '+i.stock+')</option>';
+           });
+        }
+      });
+    }
+
+    function addStock(id, name, category, price, itemSection) {
+      document.getElementById('receiveForm').reset();
+      document.getElementById('receiveItemId').value = id;
+      document.getElementById('receiveItemName').value = name;
+      document.getElementById('receiveItemName').readOnly = true;
+      document.getElementById('receiveCategory').value = category;
+      document.getElementById('receiveCategory').readOnly = true;
+      document.getElementById('receivePrice').value = price;
+      document.getElementById('receiveSection').value = itemSection || 'both';
+      document.getElementById('receiveQuantity').value = 1;
+      
+      // Hide size field and quantity becomes required for addStock
+      document.getElementById('receiveQuantity').disabled = false;
+      document.getElementById('receiveQuantity').min = 1;
+      
+      var item = globalInventory.find(function(i) { return i.id === id; });
+      if(item) {
+        document.getElementById('receiveSize').value = item.size || '';
+      }
+      document.getElementById('receiveSize').readOnly = true;
+      document.getElementById('receiveForm').onsubmit = function(event) { event.preventDefault(); saveReceivedStock(); };
+      openModal('receiveModal');
+    }
+
+    function openReceiveModal() {
+      document.getElementById('receiveForm').reset();
+      document.getElementById('receiveItemId').value = '';
+      document.getElementById('receiveItemName').readOnly = false;
+      document.getElementById('receiveCategory').readOnly = false;
+      document.getElementById('receiveSize').readOnly = false;
+      document.getElementById('receiveQuantity').disabled = false;
+      document.getElementById('receiveQuantity').min = 1;
+      document.getElementById('receiveQuantity').value = 1;
+      var sec = getSection();
+      if(sec !== 'both') document.getElementById('receiveSection').value = sec;
+      document.getElementById('receiveForm').onsubmit = function(event) { event.preventDefault(); saveReceivedStock(); };
+      openModal('receiveModal');
+    }
+    
+    function editItem(id) {
+      var item = globalInventory.find(function(i) { return i.id === id; });
+      if(!item) return;
+      document.getElementById('receiveForm').reset();
+      document.getElementById('receiveItemId').value = item.id;
+      document.getElementById('receiveItemName').value = item.name;
+      document.getElementById('receiveItemName').readOnly = false;
+      document.getElementById('receiveCategory').value = item.category;
+      document.getElementById('receiveCategory').readOnly = false;
+      document.getElementById('receivePrice').value = item.price;
+      document.getElementById('receiveSection').value = item.section || 'both';
+      document.getElementById('receiveSize').value = item.size || '';
+      document.getElementById('receiveSize').readOnly = false;
+      
+      // For editing, we don't change stock here.
+      document.getElementById('receiveQuantity').value = 0;
+      document.getElementById('receiveQuantity').disabled = true;
+      document.getElementById('receiveQuantity').min = 0;
+      
+      document.getElementById('receiveForm').onsubmit = function(event) { event.preventDefault(); saveEditedItem(); };
+      openModal('receiveModal');
+    }
+
+    function deleteItem(id) {
+      if(confirm('Are you sure you want to delete this item?')) {
+        callServer('storeDeleteItem', [AA.token, { itemId: id }], function(res) {
+          if(res.success) {
+            showToast(res.message, 'success');
+            loadInventory();
+            loadDashboard();
+          } else {
+            showToast(res.message, 'error');
+          }
+        }, null, true);
+      }
+    }
+
+    function saveReceivedStock() {
+      var id = document.getElementById('receiveItemId').value;
+      var data = {
+        id: id,
+        name: document.getElementById('receiveItemName').value,
+        category: document.getElementById('receiveCategory').value,
+        price: document.getElementById('receivePrice').value,
+        quantity: document.getElementById('receiveQuantity').value,
+        section: document.getElementById('receiveSection').value,
+        size: document.getElementById('receiveSize').value
+      };
+
+      callServer('storeReceiveItem', [AA.token, data], function(res) {
+        if(res.success) {
+          showToast(res.message, 'success');
+          closeModal('receiveModal');
+          loadInventory();
+        } else {
+          showToast(res.message, 'error');
+        }
+      }, null, true);
+    }
+    
+    function saveEditedItem() {
+      var data = {
+        id: document.getElementById('receiveItemId').value,
+        name: document.getElementById('receiveItemName').value,
+        category: document.getElementById('receiveCategory').value,
+        price: document.getElementById('receivePrice').value,
+        section: document.getElementById('receiveSection').value,
+        size: document.getElementById('receiveSize').value
+      };
+
+      callServer('storeEditItem', [AA.token, data], function(res) {
+        if(res.success) {
+          showToast(res.message, 'success');
+          closeModal('receiveModal');
+          loadInventory();
+        } else {
+          showToast(res.message, 'error');
+        }
+      }, null, true);
+    }
+
+    function loadStudents() {
+      var section = getSection();
+      callServer('storeGetStudents', [AA.token, section], function(data) {
+        globalStudents = data;
+        var sel = document.getElementById('issueStudentSelect');
+        if(sel) {
+          sel.innerHTML = '<option value="">-- Select Student --</option>';
+          data.forEach(function(s){
+             sel.innerHTML += '<option value="'+(s.id||s.userId)+'">'+s.name+' ('+(s.className||'')+')</option>';
+          });
+        }
+        // ensure inventory dropdown is also populated if not already
+        if(globalInventory.length === 0) loadInventory();
+      });
+    }
+
+    function submitIssueItem() {
+      var sId = document.getElementById('issueStudentSelect').value;
+      var iId = document.getElementById('issueItemSelect').value;
+      if(!sId || !iId) return showToast('Select student and item', 'error');
+      
+      var student = globalStudents.find(function(s){ return s.id === sId || s.userId === sId; });
+      var data = {
+        itemId: iId,
+        studentId: sId,
+        studentName: student ? student.name : 'Unknown Student',
+        quantity: document.getElementById('issueQuantity').value,
+        note: document.getElementById('issueNote').value
+      };
+
+      callServer('storeIssueItem', [AA.token, data], function(res) {
+         if(res.success) {
+           showToast('Item issued successfully', 'success');
+           document.getElementById('issueForm').reset();
+           loadInventory();
+         } else {
+           showToast(res.message, 'error');
+         }
+      }, null, true);
+    }
+
+    function loadRecords() {
+      var section = getSection();
+      callServer('storeGetRecords', [AA.token, section], function(records) {
+         buildTable('recordsTable', [
+             {key:'date', render:function(r) { return new Date(r.date).toLocaleString(); }},
+             {key:'studentName'},
+             {key:'itemName'},
+             {key:'quantity'},
+             {key:'note'},
+             {key:'issuedBy'}
+         ], records);
+      });
+    }
+
+    function loadPaidOrders() {
+      var section = getSection();
+      callServer('storeGetPaidItems', [AA.token, section], function(orders) {
+         buildTable('ordersTable', [
+           {key:'createdAt', render:function(r){ return new Date(r.createdAt).toLocaleString(); }},
+           {key:'studentName'},
+           {key:'itemName'},
+           {key:'quantity'},
+           {key:'status', render:function(r){ return '<span class="aa-badge bg-warning text-dark">Paid (Pending)</span>'; }}
+         ], orders, function(r) {
+           return '<button class="aa-btn aa-btn-success aa-btn-xs" onclick="issuePaidOrder(\''+r.id+'\', \''+r.itemId+'\', \''+r.studentId+'\', \''+r.studentName+'\', \''+r.quantity+'\')"><i class="fa fa-check"></i> Issue</button>';
+         });
+      });
+    }
+
+    function issuePaidOrder(orderId, itemId, studentId, studentName, qty) {
+      if(confirm('Are you sure you want to issue this paid item?')) {
+         var data = {
+           orderId: orderId,
+           itemId: itemId,
+           studentId: studentId,
+           studentName: studentName,
+           quantity: qty,
+           note: 'Issued from Paid Order'
+         };
+         callServer('storeIssueItem', [AA.token, data], function(res) {
+            if(res.success) {
+              showToast('Item issued', 'success');
+              loadPaidOrders();
+              loadDashboard();
+            } else {
+              showToast(res.message, 'error');
+            }
+         }, null, true);
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="manifest" href="manifest.json" />
+    <meta name="theme-color" content="#0a192f" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <link rel="apple-touch-icon" href="icon.png" />
+<meta charset="utf-8">
+<title>MySchool Portal - Cloud Functions Deployment</title>
+<style>
+  body { font-family: "Segoe UI", Arial, sans-serif; line-height: 1.6; margin: 40px; color: #333; max-width: 800px; margin: 0 auto; padding: 20px; }
+  h1 { color: #0288d1; border-bottom: 3px solid #ff9800; padding-bottom: 10px; font-size: 32px; }
+  h2 { color: #0288d1; margin-top: 40px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
+  h3 { color: #ff9800; }
+  pre { background: #1e1e1e; color: #d4d4d4; padding: 15px; border-radius: 5px; border-left: 4px solid #ff9800; white-space: pre-wrap; font-family: Consolas, monospace; font-size: 14px; overflow-x: auto; }
+  code { background: #f4f4f4; padding: 2px 5px; border-radius: 3px; font-family: Consolas, monospace; color: #d63384; }
+  .note { background: #e7f3fe; border-left: 4px solid #2196F3; padding: 15px; margin: 20px 0; border-radius: 0 4px 4px 0; }
+  .warning { background: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin: 20px 0; border-radius: 0 4px 4px 0; }
+  .step-number { background: #0288d1; color: white; display: inline-block; width: 24px; height: 24px; text-align: center; border-radius: 50%; line-height: 24px; margin-right: 10px; font-size: 14px; }
+</style>
+</head>
+<body>
+
+  <h1>MySchool Portal - Cloud Functions Deployment Guide</h1>
+  <p>This guide explains how to deploy the new Node.js (Firebase Cloud Functions) backend. This completely replaces Google Apps Script.</p>
+
+  <div class="warning">
+    <strong>Prerequisite: Node.js & Firebase CLI</strong><br>
+    You must have <a href="https://nodejs.org/" target="_blank">Node.js</a> installed on your computer. You must also install the Firebase Command Line Tools by running <code>npm install -g firebase-tools</code> in your terminal.
+  </div>
+
+  <h2><span class="step-number">1</span> Initialize Firebase in Your Project</h2>
+  <ol>
+    <li>Open your terminal (Command Prompt or PowerShell).</li>
+    <li>Navigate to your new folder: <code>cd "Myschool Portal Cloud Version"</code></li>
+    <li>Log in to Firebase via terminal:
+      <pre>firebase login</pre>
+      (This will open a browser window for you to log in with your Google account).
+    </li>
+    <li>Initialize the project:
+      <pre>firebase init functions</pre>
+    </li>
+    <li>When prompted:
+      <ul>
+        <li>Select <strong>Use an existing project</strong> and choose your Firebase project.</li>
+        <li>What language? Select <strong>JavaScript</strong>.</li>
+        <li>Use ESLint? Select <strong>No</strong>.</li>
+        <li>Do you want to install dependencies with npm now? Select <strong>Yes</strong>.</li>
+      </ul>
+    </li>
+  </ol>
+
+  <h2><span class="step-number">2</span> Overwrite with Template Files</h2>
+  <ol>
+    <li>During initialization, Firebase may have created a default <code>index.js</code> and <code>package.json</code> inside your <code>functions/</code> folder.</li>
+    <li>Ensure the <code>index.js</code> file inside <code>functions/</code> contains the Express API code that was provided in this template. (If it asks to overwrite during setup, do NOT overwrite the custom one).</li>
+    <li>Ensure all your necessary dependencies are installed by running:
+      <pre>cd functions
+npm install express cors uuid firebase-admin firebase-functions</pre>
+    </li>
+  </ol>
+
+  <h2><span class="step-number">3</span> Deploy the Cloud Function (Backend)</h2>
+  <div class="note">
+    Unlike Google Apps Script, you don't need to manually configure Private Keys or Service Accounts in Script Properties. Firebase Cloud Functions automatically authenticate themselves with your Firestore Database!
+  </div>
+  <ol>
+    <li>Make sure you are in the root folder (<code>Myschool Portal Cloud Version</code>).</li>
+    <li>Deploy the function to Firebase:
+      <pre>firebase deploy --only functions</pre>
+    </li>
+    <li>Wait for the deployment to finish. The terminal will output a <strong>Function URL</strong>. It will look something like this:
+      <br><code>https://us-central1-yourprojectname.cloudfunctions.net/api</code>
+    </li>
+    <li><strong>Copy this URL.</strong></li>
+  </ol>
+
+  <h2><span class="step-number">4</span> Connect the Frontend</h2>
+  <ol>
+    <li>Open the <code>api.js</code> file located in the root of your frontend files.</li>
+    <li>Find the <code>SCRIPT_URL</code> constant at the top of the file:
+      <pre>const SCRIPT_URL = "YOUR_APPS_SCRIPT_URL";</pre>
+    </li>
+    <li>Replace it with the new Cloud Function URL you copied in Step 3:
+      <pre>const SCRIPT_URL = "https://us-central1-yourprojectname.cloudfunctions.net/api";</pre>
+    </li>
+    <li>Save <code>api.js</code>.</li>
+  </ol>
+
+  <h2><span class="step-number">5</span> Host the Frontend</h2>
+  <ol>
+    <li>Just like the previous architecture, push all your HTML, CSS, and JS files to GitHub.</li>
+    <li>Go to your repository settings and enable <strong>GitHub Pages</strong> from the <code>main</code> branch.</li>
+    <li>Your portal is now live, running on a massively scalable Node.js backend with zero latency!</li>
+  </ol>
+
+  <p style="text-align:center; margin-top:50px; color:#777; font-size:12px;">
+    &copy; MySchool Portal Cloud Architecture
+  </p>
+</body>
+</html>

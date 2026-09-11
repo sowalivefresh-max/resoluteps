@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="manifest" href="manifest.json" />
+    <meta name="theme-color" content="#0a192f" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <link rel="apple-touch-icon" href="icon.png" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="aa-layout">
+    <div class="aa-sidebar-overlay" id="aa-sidebar-overlay"></div>
+    <aside class="aa-sidebar" id="aa-sidebar">
+      <div class="aa-sidebar-brand">
+        <div class="aa-brand-icon">AA</div>
+        <div class="aa-brand-text">
+          <div class="aa-brand-name" id="sb-school-name">Loading\u2026</div>
+          <div class="aa-brand-role">Parent Portal</div>
+        </div>
+      </div>
+      <nav class="aa-nav">
+        <div class="aa-nav-section">Main</div>
+        <button class="aa-nav-item active" id="nav-dashboard" onclick="switchTab('par-tabs', 'tab-dashboard'); setActiveNav('nav-dashboard')">
+          <i class="fa fa-home"></i> My Children
+        </button>
+        <button class="aa-nav-item" id="nav-announcements" onclick="switchTab('par-tabs', 'tab-announcements'); setActiveNav('nav-announcements')">
+          <i class="fa fa-bullhorn"></i> Announcements
+        </button>
+        <div class="aa-nav-section">Academics</div>
+        <button class="aa-nav-item" id="nav-reports" onclick="switchTab('par-tabs', 'tab-reports'); setActiveNav('nav-reports')">
+          <i class="fa fa-file-signature"></i> Report Cards
+        </button>
+        <div class="aa-nav-section">Finance</div>
+        <button class="aa-nav-item" id="nav-finance" onclick="switchTab('par-tabs', 'tab-finance'); setActiveNav('nav-finance')">
+          <i class="fa fa-file-invoice-dollar"></i> Bills & Payments
+        </button>
+        <button class="aa-nav-item text-danger" onclick="AA.logout()">
+          <i class="fa fa-sign-out-alt"></i> Logout
+        </button>
+      </nav>
+      <div class="aa-sidebar-footer">
+        <div class="aa-user-card" onclick="AA.populateProfileModal()">
+          <div class="aa-user-avatar">PR</div>
+          <div>
+            <div class="aa-user-name">Loading...</div>
+            <div class="aa-user-role">Parent</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <main class="aa-main">
+      <header class="aa-topbar">
+        <button class="aa-menu-toggle" id="aa-menu-toggle"><i class="fa fa-bars"></i></button>
+        <div class="aa-topbar-left">
+          <div class="aa-topbar-title">Parent Dashboard</div>
+          <div class="aa-topbar-subtitle" id="currentTermText">Academic Session</div>
+        </div>
+        <div class="aa-topbar-right" style="margin-left: auto; display: flex; align-items: center;">
+          <div class="notification-wrapper" id="notification-bell">
+            <i class="fa fa-bell notification-icon"></i>
+            <div class="notification-badge" id="notification-badge" style="display:none;">0</div>
+            <div class="notification-dropdown" id="notification-dropdown">
+              <div class="notification-header">Notifications</div>
+              <!-- Items appended dynamically -->
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div class="aa-content">
+        <div id="par-tabs" style="display:none;">
+          <div class="aa-tab active" data-tab="tab-dashboard" data-onload="loadDashboard"></div>
+          <div class="aa-tab" data-tab="tab-announcements" data-onload="loadParentAnnouncements"></div>
+          <div class="aa-tab" data-tab="tab-reports" data-onload="loadReportsTab"></div>
+          <div class="aa-tab" data-tab="tab-finance" data-onload="loadFinanceTab"></div>
+        </div>
+
+        <!-- TAB: Dashboard (My Children) -->
+        <div class="aa-tab-content active" data-group="par-tabs" data-id="tab-dashboard">
+          <div class="aa-grid-auto mb-4" id="childrenGrid">
+            <!-- Children cards rendered here -->
+            <div class="text-center w-100 py-4 text-muted" id="childrenLoading">Loading your wards...</div>
+          </div>
+          
+          <div class="aa-card">
+            <div class="aa-card-header"><h3 class="aa-card-title">Welcome to Abecedarian Portal</h3></div>
+            <div class="aa-card-body">
+              <p>Through this portal, you can monitor your children's academic progress, view termly report cards, and track school fee payments.</p>
+              <p>If any of your children are missing from your profile, please contact the school administration to link their records to your account.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB: Announcements -->
+        <div class="aa-tab-content" data-group="par-tabs" data-id="tab-announcements">
+          <div class="aa-card">
+            <div class="aa-card-header">
+              <h3 class="aa-card-title">School Announcements</h3>
+            </div>
+            <div class="aa-card-body">
+              <div id="announcements-container">
+                <div class="text-center w-100 py-4 text-muted">Loading announcements...</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB: Report Cards -->
+        <div class="aa-tab-content" data-group="par-tabs" data-id="tab-reports">
+          <div class="aa-card mb-4">
+            <div class="aa-card-body">
+              <div class="d-flex gap-3 align-items-center">
+                <select id="rptChildSelect" class="aa-select" style="max-width:250px;">
+                  <option value="">-- Select Child --</option>
+                </select>
+                <select id="rptTermSelect" class="aa-select" style="max-width:180px;">
+                  <option value="First Term">First Term</option>
+                  <option value="Second Term">Second Term</option>
+                  <option value="Third Term">Third Term</option>
+                </select>
+                <select id="rptSessionSelect" class="aa-select" style="max-width:150px;">
+                  <option value="2025/2026">2025/2026</option>
+                  <option value="2024/2025">2024/2025</option>
+                </select>
+                <select id="rptTypeSelect" class="aa-select" style="max-width:150px;">
+                  <option value="Full Term">Full Term</option>
+                  <option value="Half Term">Half Term</option>
+                </select>
+                <button class="aa-btn aa-btn-primary" onclick="viewChildReport()"><i class="fa fa-search"></i> Check Result</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB: Finance -->
+        <div class="aa-tab-content" data-group="par-tabs" data-id="tab-finance">
+          <div class="aa-card mb-4">
+            <div class="aa-card-body">
+              <select id="finChildSelect" class="aa-select" style="max-width:250px;" onchange="loadChildFinance(this.value)">
+                <option value="">-- Select Child to View Finance --</option>
+              </select>
+            </div>
+          </div>
+          
+          <div id="finContent" style="display:none;">
+            <!-- Clearance Badge -->
+            <div id="clearanceBadge" style="display:none; text-align:center; padding:20px; margin-bottom:16px; background:linear-gradient(135deg,#064e3b,#065f46); border-radius:14px; border:2px solid #10b981;">
+              <div style="font-size:48px; margin-bottom:6px;">✅</div>
+              <h3 style="color:#6ee7b7; margin:0 0 4px; font-size:22px;">Financially Cleared!</h3>
+              <p style="color:#a7f3d0; margin:0; font-size:14px;">All fees are fully paid. Thank you for your prompt payment!</p>
+            </div>
+            <!-- Early-Bird Banner -->
+            <div id="earlyBirdBanner" style="display:none; background:linear-gradient(135deg,#1e3a5f,#1e40af); border-radius:12px; padding:16px 20px; margin-bottom:16px; border:1px solid #3b82f6;">
+              <div style="display:flex; align-items:center; gap:12px;">
+                <div style="font-size:28px;">⚡</div>
+                <div>
+                  <div style="color:#93c5fd; font-weight:700; font-size:15px;">Early Payment Discount Available!</div>
+                  <div id="earlyBirdText" style="color:#bfdbfe; font-size:13px;">Pay in full before the deadline and save on tuition.</div>
+                </div>
+              </div>
+            </div>
+            <div class="aa-alert aa-alert-success mb-4" id="overageAlert" style="display:none;">
+              <i class="fa fa-piggy-bank" style="font-size:18px; margin-top:2px;"></i>
+              <div>This child has an overage (credit balance) of <strong id="overageAmountText">&#8358;0.00</strong>. This credit will be automatically deducted from your next term's bill when generated.</div>
+            </div>
+            <div class="aa-card mb-4">
+              <div class="aa-card-header">
+                <h3 class="aa-card-title">Term Bills</h3>
+                <button class="aa-btn aa-btn-outline aa-btn-sm" id="requestPlanBtn" style="display:none;" onclick="openInstallmentModal()"><i class="fa fa-calendar-alt"></i> Request Payment Plan</button>
+              </div>
+              <div class="aa-card-body" style="padding:0;">
+                <table class="aa-table" id="myBillsTable">
+                  <thead><tr><th>Term / Session</th><th>Total Billed</th><th>Paid</th><th>Balance Due</th><th>Status</th><th>Plan</th></tr></thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+            </div>
+            
+            <div class="aa-card">
+              <div class="aa-card-header">
+                <h3 class="aa-card-title">Payment History</h3>
+                <button class="aa-btn aa-btn-primary aa-btn-sm" onclick="openSubmitPaymentModal()"><i class="fa fa-upload"></i> Submit Payment</button>
+              </div>
+              <div class="aa-card-body" style="padding:0;">
+                <table class="aa-table" id="myPaymentsTable">
+                  <thead><tr><th>Date</th><th>Term</th><th>Ref</th><th>Amount</th><th>Status</th><th>Receipt</th></tr></thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- Submit Payment Modal -->
+  <div class="aa-modal-backdrop" id="submitPaymentModal">
+    <div class="aa-modal">
+      <div class="aa-modal-header">
+        <h5 class="aa-modal-title">Submit Payment Proof</h5>
+        <button class="aa-modal-close" onclick="closeModal('submitPaymentModal')">×</button>
+      </div>
+      <div class="aa-modal-body">
+        <div class="aa-alert aa-alert-info mb-3">
+          <i class="fa fa-info-circle" style="margin-top:2px;"></i>
+          <div>Please enter the amount paid and upload a clear picture/screenshot of your payment receipt. The accounts office will validate it.</div>
+        </div>
+        <div class="aa-form-group">
+          <label class="aa-label">Amount Paid (&#8358;)</label>
+          <input type="number" id="payAmount" class="aa-input" placeholder="e.g. 50000">
+        </div>
+        <div class="aa-form-group">
+          <label class="aa-label">Payment Method</label>
+          <select id="payMethod" class="aa-select" onchange="document.getElementById('proofContainer').style.display = this.value === 'Cash' ? 'none' : 'block';">
+            <option value="Bank Transfer">Bank Transfer</option>
+            <option value="Bank Teller">Bank Teller</option>
+            <option value="POS">POS</option>
+            <option value="Cash">Cash</option>
+          </select>
+        </div>
+        <div class="aa-form-group">
+          <label class="aa-label">Comment/Note (Optional)</label>
+          <input type="text" id="payComment" class="aa-input" placeholder="e.g. Paying for John and Jane, or paying for books">
+        </div>
+        <div class="aa-form-group" id="proofContainer">
+          <label class="aa-label">Proof of Payment (Image/Screenshot)</label>
+          <input type="file" id="payProofInput" class="aa-input" accept="image/*" onchange="previewReceiptPhoto(this)">
+          <input type="hidden" id="payProofBase64">
+          <div id="payProofPreview" class="mt-2" style="max-width:100%; max-height:200px; overflow:hidden; border-radius:6px; border:1px solid #ccc; display:none;"></div>
+        </div>
+        <button class="aa-btn aa-btn-success w-100 mt-2" onclick="processSubmitPayment()">Submit for Validation</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Profile Modal -->
+  <div class="aa-modal-backdrop" id="profileModal">
+    <div class="aa-modal">
+      <div class="aa-modal-header"><h5 class="aa-modal-title">My Profile</h5><button class="aa-modal-close" onclick="closeModal('profileModal')">×</button></div>
+      <div class="aa-modal-body">
+        <div class="text-center mb-4">
+          <div class="position-relative d-inline-block">
+            <div class="aa-user-avatar" style="width:100px;height:100px;font-size:40px;margin:0 auto 10px;border:3px solid #f0f4f8;"></div>
+            <label for="profPhotoInput" class="position-absolute" style="bottom:5px;right:5px;background:#f0a500;color:#fff;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;border:2px solid #fff;">
+              <i class="fa fa-camera"></i>
+            </label>
+            <input type="file" id="profPhotoInput" style="display:none;" accept="image/*" onchange="previewProfilePhoto(this)">
+            <input type="hidden" id="profPhotoBase64">
+          </div>
+          <div class="aa-user-name fs-20 fw-700 mt-2"></div>
+          <div class="aa-user-role text-muted fs-14"></div>
+        </div>
+        <div class="aa-form-group">
+          <label class="aa-label">Full Name</label>
+          <input type="text" id="profName" class="aa-input" placeholder="Your full name">
+        </div>
+        <div class="aa-form-group">
+          <label class="aa-label">Email Address</label>
+          <input type="email" id="profEmail" class="aa-input" placeholder="Your email address">
+        </div>
+        <div class="aa-form-group">
+          <label class="aa-label">Phone Number</label>
+          <input type="text" id="profPhone" class="aa-input" placeholder="e.g. +234...">
+        </div>
+        <hr class="my-4" style="border:0;border-top:1px solid #eee;">
+        <h6 class="mb-3">Change Password</h6>
+        <div class="aa-form-group">
+          <label class="aa-label">Current Password</label>
+          <input type="password" id="oldPwd" class="aa-input" placeholder="Enter your current password">
+        </div>
+        <div class="aa-form-group">
+          <label class="aa-label">New Password</label>
+          <input type="password" id="newPwd" class="aa-input" placeholder="Min. 6 characters">
+        </div>
+        <div class="aa-form-group">
+          <label class="aa-label">Confirm New Password</label>
+          <input type="password" id="confirmPwd" class="aa-input" placeholder="Re-enter new password">
+        </div>
+        <div class="d-flex gap-2">
+          <button class="aa-btn aa-btn-outline w-100" onclick="AA.changePwd()">Update Password</button>
+          <button class="aa-btn aa-btn-primary w-100" onclick="AA.updateProfile()">Save Details</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="api.js?v=3"></script>
+  <script src="scripts.js?v=1788044468"></script>
+  <script>
+    var currentTerm = ''; var currentSession = '';
+    var myChildren = [];
+
+    document.addEventListener('DOMContentLoaded', function() {
+      initTabs('par-tabs'); AA.init();
+      function initDashboard() {
+        if (!AA.user || !AA.settings || !AA.settings.current_term) return setTimeout(initDashboard, 100);
+        currentTerm = AA.settings.current_term; currentSession = AA.settings.current_session;
+        document.getElementById('currentTermText').textContent = currentTerm + ' - ' + currentSession;
+        document.getElementById('rptTermSelect').value = currentTerm;
+        document.getElementById('rptSessionSelect').value = currentSession;
+        loadDashboard();
+      }
+      initDashboard();
+    });
+
+    function loadDashboard() {
+      callServer('parentGetChildren', [AA.token], function(data) {
+        myChildren = data;
+        var grid = document.getElementById('childrenGrid'); grid.innerHTML = '';
+        var rSel = document.getElementById('rptChildSelect'); rSel.innerHTML='<option value="">-- Select Child --</option>';
+        var fSel = document.getElementById('finChildSelect'); fSel.innerHTML='<option value="">-- Select Child to View Finance --</option>';
+
+        if(data.length === 0) {
+          grid.innerHTML = '<div class="aa-empty w-100"><i class="fa fa-child aa-empty-icon"></i><div class="aa-empty-text">No children linked</div><div class="aa-empty-sub">Please contact the school admin.</div></div>';
+          return;
+        }
+
+        data.forEach(function(c) {
+          var id = c.id||c.iD;
+          rSel.innerHTML += '<option value="'+id+'">'+c.fullName+'</option>';
+          fSel.innerHTML += '<option value="'+id+'">'+c.fullName+'</option>';
+
+          var card = document.createElement('div');
+          card.className = 'aa-card text-center';
+          card.style.padding = '24px 16px';
+          var shield = c.isFinanciallyCleared ? ' <i class="fa fa-shield-alt text-gold" title="Financially Cleared" style="color:var(--aa-gold);"></i>' : '';
+          card.innerHTML = '<div style="width:64px;height:64px;background:var(--aa-navy);color:var(--aa-gold);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;margin:0 auto 12px;">'+c.fullName.charAt(0)+'</div>'+
+            '<h4 style="margin:0 0 4px;color:var(--aa-navy);">'+c.fullName+shield+'</h4>'+
+            '<div class="text-muted fs-12 mb-2">'+(c.class||c.className||'Unassigned')+'</div>'+
+            '<div class="aa-badge aa-badge-success mb-3">'+formatStatus(c.status)+'</div>'+
+            '<div class="d-flex gap-2 justify-content-center">'+
+              '<button class="aa-btn aa-btn-outline aa-btn-sm" onclick="switchTab(\'par-tabs\',\'tab-reports\'); setTimeout(function(){document.getElementById(\'rptChildSelect\').value=\''+id+'\';},200)"><i class="fa fa-file-alt"></i> Report</button>'+
+              '<button class="aa-btn aa-btn-info aa-btn-sm" onclick="generateIDCard(\''+id+'\')" title="Generate ID Card"><i class="fa fa-id-card"></i> ID Card</button>'+
+            '</div>';
+          grid.appendChild(card);
+        });
+      }, null, true);
+    }
+
+    function loadReportsTab() {}
+    function loadFinanceTab() {}
+
+    function generateIDCard(studentId) {
+      showToast('Generating ID Card, please wait...', 'info');
+      callServer('parentGenerateIDCard', [AA.token, studentId], function(res) {
+        if (res.success) openPDFViewer(res.previewUrl, res.downloadUrl, 'Student ID Card');
+        else showToast(res.message, 'error');
+      }, null, true);
+    }
+
+    function viewChildReport() {
+      var sid = document.getElementById('rptChildSelect').value;
+      var term = document.getElementById('rptTermSelect').value;
+      var sess = document.getElementById('rptSessionSelect').value;
+      var rptType = document.getElementById('rptTypeSelect').value;
+      if(!sid) return showToast('Please select a child', 'warning');
+      callServer('parentDownloadReport', [AA.token, sid, term, sess, rptType], function(res) {
+        if(res.success) openPDFViewer(res.previewUrl, res.downloadUrl, 'Report Card');
+        else if(res.financeLocked) {
+          showToast('Report access restricted. Outstanding balance: ' + formatNaira(res.outstandingAmount || 0) + '. Please contact accounts.', 'error');
+        }
+        else showToast(res.message, 'error');
+      }, null, true);
+    }
+
+    function loadChildFinance(sid) {
+      if(!sid) { document.getElementById('finContent').style.display='none'; return; }
+      callServer('parentGetStudentCredit', [AA.token, sid], function(credit) {
+        var alertDiv = document.getElementById('overageAlert');
+        if (credit > 0) {
+          document.getElementById('overageAmountText').textContent = formatNaira(credit);
+          alertDiv.style.display = 'flex';
+        } else {
+          alertDiv.style.display = 'none';
+        }
+      }, null, false);
+      callServer('parentGetBills', [AA.token, sid], function(bills) {
+        document.getElementById('finContent').style.display='block';
+        
+        // Compute overall balance for clearance badge / early-bird banner
+        var totalOutstanding = 0;
+        var mostRecentBill = null;
+        bills.forEach(function(b) {
+          var bal = parseFloat(b.balance) || 0;
+          var arr = parseFloat(b.arrears) || 0;
+          totalOutstanding += Math.max(0, bal + arr - (parseFloat(b.totalPaid)||0));
+          if (!mostRecentBill || new Date(b.createdAt) > new Date(mostRecentBill.createdAt)) mostRecentBill = b;
+        });
+
+        // Clearance badge
+        document.getElementById('clearanceBadge').style.display = (totalOutstanding <= 0 && bills.length > 0) ? 'block' : 'none';
+
+        // Store unpaid bills for installment modal
+        window._activeFinBills = bills.filter(function(b) {
+          var bal = parseFloat(b.balance) || 0;
+          var arr = parseFloat(b.arrears) || 0;
+          return (bal + arr) > 0;
+        });
+
+        // Show/hide plan button
+        document.getElementById('requestPlanBtn').style.display = (totalOutstanding > 0) ? 'inline-flex' : 'none';
+
+        // Early-bird banner
+        var ebBanner = document.getElementById('earlyBirdBanner');
+        if (mostRecentBill && mostRecentBill.earlyBirdDeadline && mostRecentBill.earlyBirdSavings > 0) {
+          var deadline = new Date(mostRecentBill.earlyBirdDeadline);
+          var now = new Date();
+          if (deadline > now && !mostRecentBill.earlyBirdApplied) {
+            var daysLeft = Math.ceil((deadline - now) / (1000 * 60 * 60 * 24));
+            document.getElementById('earlyBirdText').textContent = 'Pay in full before ' + deadline.toLocaleDateString() + ' (' + daysLeft + ' day' + (daysLeft !== 1 ? 's' : '') + ' left) and save \u20a6' + Number(mostRecentBill.earlyBirdSavings).toLocaleString() + ' on tuition!';
+            ebBanner.style.display = 'block';
+          } else {
+            ebBanner.style.display = 'none';
+          }
+        } else {
+          ebBanner.style.display = 'none';
+        }
+
+        // Fetch installment plans to show in table
+        callServer('parentGetInstallmentPlan', [AA.token, sid], function(plansRes) {
+          var planMap = {};
+          if (plansRes && plansRes.success && plansRes.data) {
+            plansRes.data.forEach(function(p) { planMap[p.billId] = p; });
+          }
+
+          buildTable('myBillsTable', [
+            {key:'term', render:function(r){return r.term+' '+r.session;}},
+            {key:'totalBilled', render:function(r){
+              var html = formatNaira(r.totalBilled);
+              if (r.arrears > 0) html += '<br><small class="text-danger">+ ' + formatNaira(r.arrears) + ' Arrears</small>';
+              return html;
+            }},
+            {key:'totalPaid', render:function(r){return '<span class="text-success">'+formatNaira(r.totalPaid)+'</span>';}},
+            {key:'balance', render:function(r){
+              var bal = parseFloat(r.balance) || 0;
+              var arr = parseFloat(r.arrears) || 0;
+              var totalDue = Math.max(0, bal + arr);
+              if (totalDue <= 0) return '<span class="text-success">Cleared</span>';
+              return '<span class="text-danger" style="font-weight:bold;">'+formatNaira(totalDue)+'</span>';
+            }},
+            {key:'status', render:function(r){
+               var bal = parseFloat(r.balance) || 0;
+               var arr = parseFloat(r.arrears) || 0;
+               var totalDue = bal + arr;
+               if (totalDue <= 0) return '<span class="aa-badge aa-badge-success">Paid</span>';
+               if (r.totalPaid > 0) return '<span class="aa-badge aa-badge-warning">Partial</span>';
+               return '<span class="aa-badge aa-badge-danger">Unpaid</span>';
+            }},
+            {key:'plan', render:function(r){
+              var plan = planMap[r.id];
+              if (!plan) return '<span style="color:#64748b;font-size:12px;">—</span>';
+              if (plan.status === 'pending') return '<span class="aa-badge aa-badge-warning">Plan Pending</span>';
+              if (plan.status === 'approved') {
+                var expectedPaid = 0;
+                var nowMs = new Date().getTime();
+                var gracePeriodMs = 3 * 24 * 60 * 60 * 1000;
+                (plan.milestones || []).forEach(function(m) {
+                  var dueMs = new Date(m.dueDate).getTime();
+                  if ((dueMs + gracePeriodMs) <= nowMs) {
+                    expectedPaid += Number(m.amount || 0);
+                  }
+                });
+                if (r.totalPaid < expectedPaid) {
+                  return '<span class="aa-badge aa-badge-danger" style="animation: pulse 2s infinite;"><i class="fa fa-exclamation-triangle"></i> Plan Defaulted</span>';
+                }
+                return '<span class="aa-badge aa-badge-success"><i class="fa fa-check"></i> Plan Active</span>';
+              }
+              if (plan.status === 'rejected') return '<span class="aa-badge aa-badge-danger">Plan Rejected</span>';
+              return '';
+            }}
+          ], bills);
+        }, null, false);
+      }, null, true);
+
+      // Store sid for installment modal
+      window._activeFinSid = sid;
+
+      callServer('parentGetPayments', [AA.token, sid], function(payments) {
+        buildTable('myPaymentsTable', [
+          {key:'date', render:function(r){return formatDate(r.paymentDate||r.date);}},
+          {key:'term', render:function(r){return r.term+' '+r.session;}},
+          {key:'receiptRef'},
+          {key:'amount', render:function(r){return '<strong class="text-success">'+formatNaira(r.amount)+'</strong>';}},
+          {key:'status', render:function(r){
+            var st = String(r.status || 'Approved').toLowerCase();
+            if(st === 'approved') return '<span class="aa-badge aa-badge-success"><i class="fa fa-check mr-1"></i> Approved</span>';
+            if(st === 'rejected') return '<span class="aa-badge aa-badge-danger"><i class="fa fa-times mr-1"></i> Rejected</span>';
+            return '<span class="aa-badge aa-badge-warning"><i class="fa fa-clock mr-1"></i> Pending</span>';
+          }}
+        ], payments, function(r) { 
+          var st = String(r.status || 'Approved').toLowerCase();
+          if(st === 'approved') {
+            return '<button class="aa-btn aa-btn-outline aa-btn-xs" onclick="dlReceipt(\''+(r.id||r.iD)+'\')"><i class="fa fa-download"></i> Receipt</button>'; 
+          } else if(r.proofOfPayment) {
+            return '<a href="'+r.proofOfPayment+'" target="_blank" class="aa-btn aa-btn-outline aa-btn-xs"><i class="fa fa-image"></i> View Proof</a>';
+          }
+          return '-';
+        });
+      }, null, true);
+    }
+
+    function openSubmitPaymentModal() {
+      var sid = document.getElementById('finChildSelect').value;
+      if(!sid) return showToast('Please select a child first.', 'warning');
+      document.getElementById('payAmount').value = '';
+      document.getElementById('payMethod').value = 'Bank Transfer';
+      document.getElementById('proofContainer').style.display = 'block';
+      document.getElementById('payProofInput').value = '';
+      document.getElementById('payProofBase64').value = '';
+      document.getElementById('payProofPreview').style.display = 'none';
+      document.getElementById('payProofPreview').innerHTML = '';
+      openModal('submitPaymentModal');
+    }
+
+    function previewReceiptPhoto(input) {
+      if (input.files && input.files[0]) {
+        // Compress the image to 800px max width for better readability than profile pics
+        resizeAndCompressImage(input.files[0], 800, 0.8, function(base64) {
+          document.getElementById('payProofBase64').value = base64;
+          document.getElementById('payProofPreview').innerHTML = '<img src="' + base64 + '" style="width:100%;height:auto;">';
+          document.getElementById('payProofPreview').style.display = 'block';
+        });
+      }
+    }
+
+    function processSubmitPayment() {
+      var sid = document.getElementById('finChildSelect').value;
+      var amt = document.getElementById('payAmount').value;
+      var method = document.getElementById('payMethod').value;
+      var proof = document.getElementById('payProofBase64').value;
+      var comment = document.getElementById('payComment') ? document.getElementById('payComment').value : '';
+      
+      console.log('Submitting payment for:', sid, amt, method);
+      if(!amt || amt <= 0) return showToast('Enter a valid amount', 'error');
+      if(method !== 'Cash' && !proof) return showToast('Please upload a proof of payment', 'error');
+      if(proof && proof.length > 2500000) return showToast('Image is too large. Please upload a smaller image.', 'error');
+
+      callServer('parentSubmitPaymentData', [AA.token, {
+        studentId: sid, term: currentTerm, session: currentSession, 
+        amount: amt, method: method, proofOfPayment: proof, comment: comment
+      }], function(res) {
+        console.log('Payment submit response:', res);
+        if(res.success) {
+          showToast(res.message, 'success');
+          closeModal('submitPaymentModal');
+          loadChildFinance(sid); // Refresh tables
+        } else {
+          showToast(res.message, 'error');
+        }
+      }, function(err) {
+        console.error('Payment submit error:', err);
+      }, true);
+    }
+
+    function dlReceipt(pid) {
+      showToast('Generating receipt, please wait...', 'info');
+      var newWin = window.open('', '_blank');
+      if (newWin) newWin.document.write('Generating receipt, please wait...');
+      
+      callServer('parentDownloadReceipt', [AA.token, pid], function(res) {
+        if(res && res.success) {
+          if (newWin) {
+            var htmlStr = decodeURIComponent((res.previewUrl || '').split('utf-8,')[1] || (res.previewUrl || '').split(',')[1] || '');
+            newWin.document.open();
+            newWin.document.write(htmlStr);
+            newWin.document.close();
+          } else {
+            openPDFViewer(res.previewUrl, null, 'Payment Receipt');
+          }
+        } else {
+          if (newWin) newWin.close();
+          showToast((res && res.message) ? res.message : 'Could not generate receipt.', 'error');
+        }
+      }, function(err) {
+        if (newWin) newWin.close();
+        showToast('Receipt error: ' + (err || 'Unknown error'), 'error');
+      }, true);
+    }
+    function openInstallmentModal() {
+      var sid = window._activeFinSid;
+      if (!sid) return showToast('Please select a child first.', 'warning');
+      var unpaidBills = window._activeFinBills || [];
+      if (unpaidBills.length === 0) return showToast('No outstanding bills found to create a plan for.', 'warning');
+
+      // Build bill selector
+      var billOptions = unpaidBills.map(function(b) {
+        var totalDue = (parseFloat(b.balance)||0) + (parseFloat(b.arrears)||0);
+        return '<option value="' + b.id + '" data-term="' + (b.term||'') + '" data-session="' + (b.session||'') + '" data-total="' + totalDue + '">' + b.term + ' ' + b.session + ' — ' + formatNaira(totalDue) + ' due</option>';
+      }).join('');
+      document.getElementById('installmentBillSelect').innerHTML = billOptions;
+      // Update total display when bill changes
+      updateInstallmentTotal();
+
+      document.getElementById('installmentMilestones').innerHTML = '<div class="milestone-row" style="display:flex;gap:8px;margin-bottom:8px;"><input type="date" class="aa-input" style="flex:1;"><input type="number" class="aa-input" placeholder="Amount (&#8358;)" style="flex:1;"><button type="button" onclick="addMilestoneRow()" class="aa-btn aa-btn-outline aa-btn-sm" style="flex:0 0 auto;"><i class="fa fa-plus"></i></button></div>';
+      openModal('installmentModal');
+    }
+    function updateInstallmentTotal() {
+      var sel = document.getElementById('installmentBillSelect');
+      if (!sel) return;
+      var opt = sel.options[sel.selectedIndex];
+      var total = opt ? parseFloat(opt.getAttribute('data-total') || 0) : 0;
+      var el = document.getElementById('installmentTotalDue');
+      if (el) el.textContent = formatNaira(total);
+    }
+    function addMilestoneRow() {
+      var div = document.createElement('div');
+      div.className = 'milestone-row';
+      div.style.cssText = 'display:flex;gap:8px;margin-bottom:8px;';
+      div.innerHTML = '<input type="date" class="aa-input" placeholder="Due Date" style="flex:1;"><input type="number" class="aa-input" placeholder="Amount (&#8358;)" style="flex:1;"><button type="button" onclick="this.parentNode.remove()" class="aa-btn aa-btn-sm" style="flex:0 0 auto;background:#ef4444;color:#fff;"><i class="fa fa-trash"></i></button>';
+      document.getElementById('installmentMilestones').appendChild(div);
+    }
+    function submitInstallmentPlan() {
+      var sid = window._activeFinSid;
+      if (!sid) return showToast('No child selected.', 'warning');
+      var rows = document.querySelectorAll('#installmentMilestones .milestone-row');
+      var milestones = [];
+      var valid = true;
+      rows.forEach(function(row) {
+        var inputs = row.querySelectorAll('input');
+        var date = inputs[0] ? inputs[0].value : '';
+        var amount = inputs[1] ? parseFloat(inputs[1].value) : 0;
+        if (!date || !amount || amount <= 0) { valid = false; return; }
+        milestones.push({ dueDate: date, amount: amount });
+      });
+      if (!valid || milestones.length === 0) return showToast('Please fill in all milestone rows correctly.', 'warning');
+      // Get the selected bill details
+      var sel = document.getElementById('installmentBillSelect');
+      var opt = sel ? sel.options[sel.selectedIndex] : null;
+      var billId = opt ? opt.value : null;
+      var term = opt ? opt.getAttribute('data-term') : null;
+      var session = opt ? opt.getAttribute('data-session') : null;
+      if (!billId) return showToast('Please select a bill to create the plan for.', 'warning');
+      callServer('parentRequestInstallmentPlan', [AA.token, sid, billId, term, session, milestones], function(res) {
+        if (res.success) {
+          showToast(res.message, 'success');
+          closeModal('installmentModal');
+          loadChildFinance(sid);
+        } else {
+          showToast(res.message, 'error');
+        }
+      }, null, true);
+    }
+  </script>
+
+  <!-- Installment Plan Modal -->
+  <div class="aa-modal-backdrop" id="installmentModal">
+    <div class="aa-modal" style="max-width:520px;">
+      <div class="aa-modal-header">
+        <h5 class="aa-modal-title"><i class="fa fa-calendar-alt"></i> Request Installment Plan</h5>
+        <button class="aa-modal-close" onclick="closeModal('installmentModal')">×</button>
+      </div>
+      <div class="aa-modal-body">
+        <div class="aa-alert aa-alert-info mb-3">
+          <i class="fa fa-info-circle" style="margin-top:2px;"></i>
+          <div>Define your preferred payment milestones. The <strong>total of all milestones must equal the total amount due</strong>. The accounts office will review and approve your plan.</div>
+        </div>
+        <div class="aa-form-group mb-3">
+          <label class="aa-label">Select Bill</label>
+          <select id="installmentBillSelect" class="aa-select" onchange="updateInstallmentTotal()"></select>
+        </div>
+        <div style="background:rgba(255,255,255,0.06); border-radius:8px; padding:12px 16px; margin-bottom:16px; display:flex; justify-content:space-between; align-items:center;">
+          <span style="color:#94a3b8; font-size:13px;">Total Amount Due:</span>
+          <strong id="installmentTotalDue" style="color:#f0a500; font-size:18px;">&#8358;0.00</strong>
+        </div>
+        <label class="aa-label">Payment Milestones</label>
+        <div id="installmentMilestones" class="mb-3"></div>
+        <button class="aa-btn aa-btn-success w-100 mt-2" onclick="submitInstallmentPlan()"><i class="fa fa-paper-plane"></i> Submit for Approval</button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

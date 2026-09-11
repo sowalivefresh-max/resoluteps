@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="manifest" href="manifest.json" />
+    <meta name="theme-color" content="#0a192f" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <link rel="apple-touch-icon" href="icon.png" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sick Bay Dashboard - School Nurse</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="aa-layout">
+    <div class="aa-sidebar-overlay" id="aa-sidebar-overlay"></div>
+    <aside class="aa-sidebar" id="aa-sidebar">
+      <div class="aa-sidebar-brand">
+        <div class="aa-brand-icon">SB</div>
+        <div class="aa-brand-text">
+          <div class="aa-brand-name" id="sb-school-name">Loading…</div>
+          <div class="aa-brand-role">School Nurse</div>
+        </div>
+      </div>
+      <nav class="aa-nav">
+        <div class="aa-nav-section">Main</div>
+        <button class="aa-nav-item active" id="nav-dashboard" onclick="switchTab('nurse-tabs', 'tab-dashboard'); setActiveNav('nav-dashboard'); loadDashboard();">
+          <i class="fa fa-clinic-medical"></i> Dashboard
+        </button>
+        <button class="aa-nav-item" id="nav-records" onclick="switchTab('nurse-tabs', 'tab-records'); setActiveNav('nav-records'); loadRecords();">
+          <i class="fa fa-history"></i> Sick Bay Records
+        </button>
+        <div class="aa-nav-section">Account</div>
+        <button class="aa-nav-item text-danger" onclick="AA.logout()">
+          <i class="fa fa-sign-out-alt"></i> Logout
+        </button>
+      </nav>
+      <div class="aa-sidebar-footer">
+        <div class="aa-user-card" onclick="AA.populateProfileModal()">
+          <div class="aa-user-avatar">N</div>
+          <div>
+            <div class="aa-user-name" id="profDisplayName">Loading...</div>
+            <div class="aa-user-role">School Nurse</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <main class="aa-main">
+      <header class="aa-topbar">
+        <button class="aa-menu-toggle" id="aa-menu-toggle"><i class="fa fa-bars"></i></button>
+        <div class="aa-topbar-left">
+          <div class="aa-topbar-title">Sick Bay Dashboard</div>
+          <div class="aa-topbar-subtitle">Student Health Management</div>
+        </div>
+        <div class="aa-topbar-right">
+          <button class="aa-btn aa-btn-primary" onclick="openAddRecordModal()"><i class="fa fa-plus"></i> Log Visit</button>
+        </div>
+      </header>
+
+      <div class="aa-content">
+        <div id="nurse-tabs" style="display:none;">
+          <div class="aa-tab active" data-tab="tab-dashboard" data-onload="loadDashboard"></div>
+          <div class="aa-tab" data-tab="tab-records" data-onload="loadRecords"></div>
+        </div>
+
+        <!-- TAB: Dashboard -->
+        <div class="aa-tab-content active" data-group="nurse-tabs" data-id="tab-dashboard">
+          <div class="aa-grid-3 mb-4">
+            <div class="aa-stat-card">
+              <div class="aa-stat-icon bg-info"><i class="fa fa-user-injured"></i></div>
+              <div class="aa-stat-value" id="stat-total-visits">-</div>
+              <div class="aa-stat-label">Total Visits</div>
+            </div>
+            <div class="aa-stat-card">
+              <div class="aa-stat-icon bg-warning"><i class="fa fa-calendar-day"></i></div>
+              <div class="aa-stat-value" id="stat-today-visits">-</div>
+              <div class="aa-stat-label">Visits Today</div>
+            </div>
+          </div>
+          <div class="aa-card">
+            <div class="aa-card-header">
+              <h3 class="aa-card-title">Recent Sick Bay Visits</h3>
+            </div>
+            <div class="aa-card-body" style="padding:0;">
+              <table class="aa-table" id="recentRecordsTable">
+                <thead><tr><th>Date</th><th>Pupil Name</th><th>Class</th><th>Complaints</th><th>Medication</th><th>Administered By</th></tr></thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB: All Records -->
+        <div class="aa-tab-content" data-group="nurse-tabs" data-id="tab-records">
+          <div class="aa-card">
+            <div class="aa-card-header">
+              <h3 class="aa-card-title">All Sick Bay Records</h3>
+              <div class="d-flex gap-2">
+                <input type="text" id="searchRecords" class="aa-input" placeholder="Search pupil name..." onkeyup="filterTable('searchRecords', 'allRecordsTable')" style="max-width:250px;">
+                <button class="aa-btn aa-btn-primary" onclick="openAddRecordModal()"><i class="fa fa-plus"></i> Log Visit</button>
+              </div>
+            </div>
+            <div class="aa-card-body" style="padding:0;">
+              <table class="aa-table" id="allRecordsTable">
+                <thead><tr><th>Date</th><th>Pupil Name</th><th>Class</th><th>Complaints</th><th>Medication</th><th>Administered By</th></tr></thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Add Record Modal -->
+  <div class="aa-modal-backdrop" id="addRecordModal">
+    <div class="aa-modal">
+      <div class="aa-modal-header">
+        <h5 class="aa-modal-title">Log Sick Bay Visit</h5>
+        <button class="aa-modal-close" onclick="closeModal('addRecordModal')">×</button>
+      </div>
+      <div class="aa-modal-body">
+        <form id="addRecordForm" onsubmit="event.preventDefault(); submitAddRecord();">
+          <div class="aa-form-group">
+            <label class="aa-label">Pupil (Select or Search)</label>
+            <select id="recordStudentSelect" class="aa-select" required></select>
+          </div>
+          <div class="aa-form-group">
+            <label class="aa-label">Complaints</label>
+            <textarea id="recordComplaints" class="aa-input" rows="3" required placeholder="Describe the pupil's complaints..."></textarea>
+          </div>
+          <div class="aa-form-group">
+            <label class="aa-label">Medication/Treatment Administered</label>
+            <textarea id="recordMedication" class="aa-input" rows="3" required placeholder="Details of treatment given..."></textarea>
+          </div>
+          <div class="aa-form-group">
+            <label class="aa-label">Administered By</label>
+            <input type="text" id="recordAdministeredBy" class="aa-input" required placeholder="Name of person administering treatment">
+          </div>
+          <div class="aa-modal-footer" style="padding: 20px 0 0 0; margin-top:20px; border-top:1px solid rgba(0,0,0,0.05);">
+            <button type="button" class="aa-btn aa-btn-outline" onclick="closeModal('addRecordModal')">Cancel</button>
+            <button type="submit" class="aa-btn aa-btn-primary" id="saveRecordBtn">Save Record & Notify Parent</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Profile Modal (Common) -->
+  <div class="aa-modal-backdrop" id="profileModal">
+    <div class="aa-modal">
+      <div class="aa-modal-header">
+        <h5 class="aa-modal-title">My Profile</h5>
+        <button class="aa-modal-close" onclick="closeModal('profileModal')">&times;</button>
+      </div>
+      <div class="aa-modal-body">
+        <div style="text-align:center; margin-bottom:20px;">
+          <div class="aa-user-avatar" style="width:80px;height:80px;font-size:32px;margin:0 auto 10px auto;">N</div>
+          <div class="aa-user-name" style="font-size:18px;">Loading...</div>
+          <div class="aa-user-role" style="font-size:14px;">School Nurse</div>
+        </div>
+        <div class="aa-form-group">
+          <label class="aa-label">Full Name</label>
+          <input type="text" id="profName" class="aa-input" readonly>
+        </div>
+        <div class="aa-form-group">
+          <label class="aa-label">Email</label>
+          <input type="email" id="profEmail" class="aa-input" readonly>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="api.js?v=2"></script>
+  <script src="scripts.js?v=2"></script>
+  <script>
+    var globalStudents = [];
+    var globalRecords = [];
+
+    document.addEventListener('DOMContentLoaded', function() {
+      AA.init();
+      initTabs('nurse-tabs');
+      // Wait a moment for AA to load user
+      setTimeout(function() {
+        if(AA.user) {
+          document.getElementById('profDisplayName').textContent = AA.user.fullName;
+          document.getElementById('profName').value = AA.user.fullName;
+          document.getElementById('profEmail').value = AA.user.email;
+        }
+        loadStudents();
+        loadDashboard();
+      }, 1000);
+    });
+
+    function loadStudents() {
+      callServer('sickbayGetStudents', [AA.token, 'both', null], function(res) {
+        if (res.success) {
+          globalStudents = res.data || [];
+          var sel = document.getElementById('recordStudentSelect');
+          sel.innerHTML = '<option value="">Select a Pupil...</option>';
+          // Sort by name
+          globalStudents.sort(function(a, b) {
+            var nameA = (a.fullName || (a.firstName + ' ' + a.lastName) || '').toLowerCase();
+            var nameB = (b.fullName || (b.firstName + ' ' + b.lastName) || '').toLowerCase();
+            return nameA.localeCompare(nameB);
+          });
+          globalStudents.forEach(function(s) {
+            var name = s.fullName || (s.firstName + ' ' + s.lastName) || 'Unknown';
+            sel.innerHTML += '<option value="' + s.studentId + '">' + AA.escapeHTML(name) + ' (' + AA.escapeHTML(s.className || 'No Class') + ')</option>';
+          });
+        }
+      });
+    }
+
+    function loadDashboard() {
+      callServer('sickbayGetRecords', [AA.token], function(res) {
+        if (res.success) {
+          globalRecords = res.data || [];
+          updateDashboardStats();
+          buildTable('recentRecordsTable', [
+            { key: 'date', render: function(r) { return formatDateTime(r.date); } },
+            { key: 'studentName' },
+            { key: 'className' },
+            { key: 'complaints' },
+            { key: 'medication' },
+            { key: 'administeredBy' }
+          ], globalRecords.slice(0, 10)); // Just 10 recent
+        }
+      });
+    }
+
+    function updateDashboardStats() {
+      document.getElementById('stat-total-visits').textContent = globalRecords.length;
+      var today = new Date().toLocaleDateString();
+      var todayCount = globalRecords.filter(function(r) {
+        var d = new Date(r.date);
+        return !isNaN(d) && d.toLocaleDateString() === today;
+      }).length;
+      document.getElementById('stat-today-visits').textContent = todayCount;
+    }
+
+    function loadRecords() {
+      callServer('sickbayGetRecords', [AA.token], function(res) {
+        if (res.success) {
+          globalRecords = res.data || [];
+          buildTable('allRecordsTable', [
+            { key: 'date', render: function(r) { return formatDateTime(r.date); } },
+            { key: 'studentName' },
+            { key: 'className' },
+            { key: 'complaints' },
+            { key: 'medication' },
+            { key: 'administeredBy' }
+          ], globalRecords);
+        }
+      });
+    }
+
+    function openAddRecordModal() {
+      document.getElementById('addRecordForm').reset();
+      document.getElementById('recordAdministeredBy').value = AA.user ? AA.user.fullName : 'School Nurse';
+      openModal('addRecordModal');
+    }
+
+    function submitAddRecord() {
+      var studentId = document.getElementById('recordStudentSelect').value;
+      var complaints = document.getElementById('recordComplaints').value.trim();
+      var medication = document.getElementById('recordMedication').value.trim();
+      var administeredBy = document.getElementById('recordAdministeredBy').value.trim();
+      
+      if (!studentId || !complaints || !medication || !administeredBy) {
+        return showToast('Please fill all required fields.', 'error');
+      }
+
+      var data = {
+        studentId: studentId,
+        complaints: complaints,
+        medication: medication,
+        administeredBy: administeredBy,
+        date: new Date().toISOString()
+      };
+
+      document.getElementById('saveRecordBtn').disabled = true;
+      document.getElementById('saveRecordBtn').textContent = 'Saving...';
+
+      callServer('sickbayAddRecord', [AA.token, data], function(res) {
+        document.getElementById('saveRecordBtn').disabled = false;
+        document.getElementById('saveRecordBtn').textContent = 'Save Record & Notify Parent';
+        if (res.success) {
+          showToast('Sick bay record logged successfully.', 'success');
+          closeModal('addRecordModal');
+          loadDashboard();
+          if (document.querySelector('.aa-tab-content[data-id="tab-records"]').classList.contains('active')) {
+            loadRecords();
+          }
+        }
+      });
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="manifest" href="manifest.json" />
+    <meta name="theme-color" content="#0a192f" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <link rel="apple-touch-icon" href="icon.png" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Parent Registration | MySchool Cloud</title>
+  <meta name="description" content="Create your parent account on the school portal using your invite link.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --accent: #6366f1;
+      --accent-2: #8b5cf6;
+      --success: #10b981;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --bg: #0f172a;
+      --border: rgba(255,255,255,0.10);
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+    }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      position: relative;
+      overflow-x: hidden;
+    }
+    body::before, body::after {
+      content: '';
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.15;
+      z-index: 0;
+      pointer-events: none;
+    }
+    body::before {
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, #6366f1, #8b5cf6);
+      top: -100px; left: -100px;
+      animation: float1 8s ease-in-out infinite;
+    }
+    body::after {
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, #10b981, #0ea5e9);
+      bottom: -100px; right: -100px;
+      animation: float2 10s ease-in-out infinite;
+    }
+    @keyframes float1 { 0%,100%{transform:translate(0,0);} 50%{transform:translate(30px,20px);} }
+    @keyframes float2 { 0%,100%{transform:translate(0,0);} 50%{transform:translate(-20px,30px);} }
+    .page-card {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 480px;
+      background: rgba(255,255,255,0.04);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 40px 36px;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.4);
+      animation: fadeUp 0.5s ease;
+    }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(24px);} to{opacity:1;transform:translateY(0);} }
+    .school-brand { text-align: center; margin-bottom: 28px; }
+    .school-icon {
+      width: 64px; height: 64px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      border-radius: 16px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      color: #fff;
+      margin-bottom: 14px;
+      box-shadow: 0 8px 24px rgba(99,102,241,0.4);
+    }
+    .school-name { font-size: 20px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+    .school-subtitle { font-size: 13px; color: var(--muted); }
+    .status-screen { text-align: center; padding: 20px 0; }
+    .status-icon {
+      width: 72px; height: 72px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      margin-bottom: 16px;
+    }
+    .status-icon.error   { background: rgba(239,68,68,0.15);  color: var(--danger); }
+    .status-icon.success { background: rgba(16,185,129,0.15); color: var(--success); }
+    .status-title { font-size: 18px; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+    .status-msg { font-size: 14px; color: var(--muted); line-height: 1.6; }
+    .spinner { width: 36px; height: 36px; border: 3px solid rgba(255,255,255,0.1); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .form-title { font-size: 17px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+    .form-desc { font-size: 13px; color: var(--muted); margin-bottom: 24px; line-height: 1.5; }
+    .linked-student-banner {
+      background: rgba(99,102,241,0.12);
+      border: 1px solid rgba(99,102,241,0.25);
+      border-radius: 10px;
+      padding: 12px 16px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .linked-student-banner i { color: var(--accent); font-size: 16px; flex-shrink: 0; }
+    .linked-student-banner span { font-size: 13px; color: var(--text); }
+    .linked-student-banner strong { color: var(--accent); }
+    .form-group { margin-bottom: 16px; }
+    .form-label { display: block; font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
+    .input-wrap { position: relative; }
+    .input-wrap i.icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 14px; pointer-events: none; }
+    .form-input {
+      width: 100%;
+      padding: 12px 14px 12px 40px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font-size: 14px;
+      font-family: 'Inter', sans-serif;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      outline: none;
+    }
+    .form-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(99,102,241,0.2); }
+    .form-input::placeholder { color: rgba(148,163,184,0.5); }
+    .toggle-pwd { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); color: var(--muted); cursor: pointer; font-size: 14px; transition: color 0.2s; }
+    .toggle-pwd:hover { color: var(--text); }
+    .btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      padding: 13px;
+      border: none;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 600;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-top: 8px;
+    }
+    .btn-primary { background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #fff; box-shadow: 0 4px 15px rgba(99,102,241,0.4); }
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(99,102,241,0.5); }
+    .btn-primary:active { transform: translateY(0); }
+    .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+    .btn-outline { background: transparent; color: var(--text); border: 1px solid var(--border); }
+    .btn-outline:hover { background: rgba(255,255,255,0.06); }
+    .error-msg { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2); color: #fca5a5; border-radius: 8px; padding: 10px 14px; font-size: 13px; margin-bottom: 16px; display: none; }
+    .login-link { text-align: center; margin-top: 20px; font-size: 13px; color: var(--muted); }
+    .login-link a { color: var(--accent); text-decoration: none; font-weight: 500; }
+    .login-link a:hover { text-decoration: underline; }
+    .pwd-strength { display: flex; gap: 4px; margin-top: 8px; }
+    .pwd-bar { flex: 1; height: 3px; border-radius: 2px; background: rgba(255,255,255,0.1); transition: background 0.3s; }
+    .pwd-bar.weak  { background: var(--danger); }
+    .pwd-bar.fair  { background: var(--warning); }
+    .pwd-bar.good  { background: var(--success); }
+    .pwd-label { font-size: 11px; color: var(--muted); margin-top: 4px; }
+  </style>
+</head>
+<body>
+  <div class="page-card" id="pageCard">
+    <div class="school-brand">
+      <div class="school-icon"><i class="fa fa-graduation-cap"></i></div>
+      <div class="school-name" id="schoolNameDisplay">School Portal</div>
+      <div class="school-subtitle">Parent Registration</div>
+    </div>
+
+    <!-- LOADING SCREEN -->
+    <div id="screenLoading" class="status-screen">
+      <div class="spinner"></div>
+      <div class="status-title">Validating your invite...</div>
+      <div class="status-msg">Please wait while we verify your registration link.</div>
+    </div>
+
+    <!-- ERROR SCREEN -->
+    <div id="screenError" class="status-screen" style="display:none;">
+      <div class="status-icon error"><i class="fa fa-exclamation-triangle"></i></div>
+      <div class="status-title">Invalid Invite</div>
+      <div class="status-msg" id="errorMsg">This invite link is not valid.</div>
+      <div style="margin-top:20px;">
+        <a href="Login.html" class="btn btn-outline" style="text-decoration:none; display:flex; align-items:center; justify-content:center; gap:8px;">
+          <i class="fa fa-arrow-left"></i> Go to Login
+        </a>
+      </div>
+    </div>
+
+    <!-- REGISTRATION FORM -->
+    <div id="screenForm" style="display:none;">
+      <div class="form-title">Create Your Parent Account</div>
+      <div class="form-desc" id="formDesc">You've been invited to join the school portal. Fill in your details below to get started.</div>
+      <div class="linked-student-banner" id="linkedBanner" style="display:none;">
+        <i class="fa fa-link"></i>
+        <span id="linkedBannerText">This account will be linked to your child: <strong id="linkedStudentName">—</strong></span>
+      </div>
+      <div id="formError" class="error-msg"></div>
+      <div class="form-group">
+        <label class="form-label">Full Name *</label>
+        <div class="input-wrap">
+          <i class="fa fa-user icon"></i>
+          <input type="text" id="regName" class="form-input" placeholder="e.g. Fatima Ahmed" autocomplete="name">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email Address *</label>
+        <div class="input-wrap">
+          <i class="fa fa-envelope icon"></i>
+          <input type="email" id="regEmail" class="form-input" placeholder="your@email.com" autocomplete="email">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Phone Number</label>
+        <div class="input-wrap">
+          <i class="fa fa-phone icon"></i>
+          <input type="tel" id="regPhone" class="form-input" placeholder="e.g. 08012345678" autocomplete="tel">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password *</label>
+        <div class="input-wrap">
+          <i class="fa fa-lock icon"></i>
+          <input type="password" id="regPassword" class="form-input" placeholder="Create a strong password" autocomplete="new-password" oninput="checkStrength(this.value)">
+          <span class="toggle-pwd" onclick="togglePwd('regPassword', this)"><i class="fa fa-eye"></i></span>
+        </div>
+        <div class="pwd-strength">
+          <div class="pwd-bar" id="bar1"></div>
+          <div class="pwd-bar" id="bar2"></div>
+          <div class="pwd-bar" id="bar3"></div>
+          <div class="pwd-bar" id="bar4"></div>
+        </div>
+        <div class="pwd-label" id="pwdLabel"></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Confirm Password *</label>
+        <div class="input-wrap">
+          <i class="fa fa-lock icon"></i>
+          <input type="password" id="regConfirm" class="form-input" placeholder="Re-enter your password" autocomplete="new-password">
+          <span class="toggle-pwd" onclick="togglePwd('regConfirm', this)"><i class="fa fa-eye"></i></span>
+        </div>
+      </div>
+      <button class="btn btn-primary" id="regBtn" onclick="submitRegistration()">
+        <i class="fa fa-user-check"></i> Create My Account
+      </button>
+      <div class="login-link">Already have an account? <a href="Login.html">Sign in here</a></div>
+    </div>
+
+    <!-- SUCCESS SCREEN -->
+    <div id="screenSuccess" class="status-screen" style="display:none;">
+      <div class="status-icon success"><i class="fa fa-check-circle"></i></div>
+      <div class="status-title">Account Created!</div>
+      <div class="status-msg">
+        Your parent account has been set up successfully. You can now log in to view your child's academic information, results, and bills.
+      </div>
+      <div style="margin-top:24px;">
+        <a href="Login.html" class="btn btn-primary" style="text-decoration:none; display:flex; align-items:center; justify-content:center; gap:8px;">
+          <i class="fa fa-sign-in-alt"></i> Go to Login
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script src="api.js?v=3"></script>
+  <script>
+    var inviteToken = null;
+
+    window.addEventListener('DOMContentLoaded', function() {
+      var params = new URLSearchParams(window.location.search);
+      inviteToken = params.get('token');
+      if (!inviteToken) {
+        showScreen('error', 'No invite token found. Please use the link provided by your school.');
+        return;
+      }
+      runBackendAction('validateParentInvite', [inviteToken])
+        .then(function(res) {
+          if (!res.success) { showScreen('error', res.message || 'Invalid invite link.'); return; }
+          document.getElementById('schoolNameDisplay').textContent = res.schoolName || 'School Portal';
+          document.title = 'Parent Registration | ' + (res.schoolName || 'School Portal');
+          if (res.linkedStudentNames && res.linkedStudentNames.length > 0) {
+            const namesText = res.linkedStudentNames.join(', ');
+            document.getElementById('linkedStudentName').textContent = namesText;
+            document.getElementById('linkedBannerText').innerHTML = 'This account will be linked to your ' + (res.linkedStudentNames.length > 1 ? 'children' : 'child') + ': <strong id="linkedStudentName">' + namesText + '</strong>';
+            document.getElementById('linkedBanner').style.display = 'flex';
+            document.getElementById('formDesc').textContent = 'You\'ve been invited to ' + (res.schoolName || 'the school portal') + '. Your account will be automatically linked to your child\'s record.';
+          } else {
+            document.getElementById('formDesc').textContent = 'You\'ve been invited to ' + (res.schoolName || 'the school portal') + '. Fill in your details to create your parent account.';
+          }
+          showScreen('form');
+        })
+        .catch(function() { showScreen('error', 'Connection error. Please check your internet and try again.'); });
+    });
+
+    function showScreen(name, msg) {
+      ['Loading','Error','Form','Success'].forEach(function(s){ document.getElementById('screen'+s).style.display='none'; });
+      var map = { loading:'screenLoading', error:'screenError', form:'screenForm', success:'screenSuccess' };
+      document.getElementById(map[name]).style.display = 'block';
+      if (name === 'error' && msg) document.getElementById('errorMsg').textContent = msg;
+    }
+
+    function togglePwd(id, el) {
+      var inp = document.getElementById(id);
+      var icon = el.querySelector('i');
+      inp.type = inp.type === 'password' ? 'text' : 'password';
+      icon.className = inp.type === 'text' ? 'fa fa-eye-slash' : 'fa fa-eye';
+    }
+
+    function checkStrength(val) {
+      var bars = [document.getElementById('bar1'), document.getElementById('bar2'), document.getElementById('bar3'), document.getElementById('bar4')];
+      var label = document.getElementById('pwdLabel');
+      bars.forEach(function(b) { b.className = 'pwd-bar'; });
+      var score = 0;
+      if (val.length >= 8) score++;
+      if (/[A-Z]/.test(val)) score++;
+      if (/[0-9]/.test(val)) score++;
+      if (/[^A-Za-z0-9]/.test(val)) score++;
+      var cls = score <= 1 ? 'weak' : (score <= 2 ? 'fair' : 'good');
+      var lbl = score <= 1 ? 'Weak' : (score <= 2 ? 'Fair' : (score === 3 ? 'Good' : 'Strong'));
+      for (var i = 0; i < score; i++) bars[i].classList.add(cls);
+      label.textContent = val.length > 0 ? lbl : '';
+      label.style.color = cls === 'weak' ? '#fca5a5' : (cls === 'fair' ? '#fcd34d' : '#6ee7b7');
+    }
+
+    function submitRegistration() {
+      var name = document.getElementById('regName').value.trim();
+      var email = document.getElementById('regEmail').value.trim();
+      var phone = document.getElementById('regPhone').value.trim();
+      var password = document.getElementById('regPassword').value;
+      var confirm = document.getElementById('regConfirm').value;
+      var errEl = document.getElementById('formError');
+      errEl.style.display = 'none';
+
+      if (!name || !email || !password || !confirm) { errEl.textContent = 'Please fill in all required fields.'; errEl.style.display = 'block'; return; }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { errEl.textContent = 'Please enter a valid email address.'; errEl.style.display = 'block'; return; }
+      if (password.length < 6) { errEl.textContent = 'Password must be at least 6 characters.'; errEl.style.display = 'block'; return; }
+      if (password !== confirm) { errEl.textContent = 'Passwords do not match.'; errEl.style.display = 'block'; return; }
+
+      var btn = document.getElementById('regBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Creating Account...';
+
+      runBackendAction('parentSelfRegister', [inviteToken, name, email, password, phone])
+        .then(function(res) {
+          if (res.success) {
+            showScreen('success');
+          } else {
+            errEl.textContent = res.message || 'Registration failed. Please try again.';
+            errEl.style.display = 'block';
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa fa-user-check"></i> Create My Account';
+          }
+        })
+        .catch(function() {
+          errEl.textContent = 'Connection error. Please try again.';
+          errEl.style.display = 'block';
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fa fa-user-check"></i> Create My Account';
+        });
+    }
+  </script>
+</body>
+</html>

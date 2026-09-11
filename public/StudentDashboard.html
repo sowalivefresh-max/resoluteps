@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="manifest" href="manifest.json" />
+    <meta name="theme-color" content="#0a192f" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <link rel="apple-touch-icon" href="icon.png" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+:root{--accent:#f0a500;--accent2:#c88600;--bg:#0d1b2a;--bg2:#111f30;--bg3:#182840;--card:rgba(255,255,255,0.05);--border:rgba(255,255,255,0.1);--text:rgba(255,255,255,0.9);--muted:rgba(255,255,255,0.5);}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;}
+.sidebar{width:240px;min-height:100vh;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;}
+.sidebar-brand{padding:20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;}
+.sidebar-brand-icon{width:40px;height:40px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.sidebar-user{padding:16px 20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border);}
+.user-avatar{width:38px;height:38px;background:linear-gradient(135deg,#4f46e5,#7c3aed);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;flex-shrink:0;}
+.nav-section{padding:8px 12px 4px;font-size:10px;font-weight:700;color:var(--muted);letter-spacing:1px;text-transform:uppercase;}
+.nav-item{display:flex;align-items:center;gap:12px;padding:11px 20px;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;transition:all .2s;border-left:3px solid transparent;}
+.nav-item:hover{color:#fff;background:rgba(255,255,255,0.05);}
+.nav-item.active{color:var(--accent);background:rgba(240,165,0,0.08);border-left-color:var(--accent);font-weight:600;}
+.nav-item i{width:18px;text-align:center;}
+.nav-badge{margin-left:auto;background:var(--accent);color:#0d1b2a;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;}
+.sidebar-footer{margin-top:auto;padding:16px 20px;border-top:1px solid var(--border);}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.topbar{height:60px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 28px;gap:16px;flex-shrink:0;}
+.topbar-title{font-size:18px;font-weight:700;flex:1;}
+.page{display:none;flex:1;overflow-y:auto;padding:28px;}
+.page.active{display:block;}
+.stats-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;margin-bottom:24px;}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;display:flex;align-items:center;gap:16px;transition:all .2s;}
+.stat-card:hover{border-color:rgba(240,165,0,0.3);transform:translateY(-1px);}
+.stat-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.stat-val{font-size:26px;font-weight:800;}
+.stat-lbl{font-size:12px;color:var(--muted);margin-top:2px;}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:20px;}
+.card-header{padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.card-title{font-size:15px;font-weight:700;}
+.card-body{padding:20px 22px;}
+.aa-table{width:100%;border-collapse:collapse;font-size:13px;}
+.aa-table th{padding:10px 14px;text-align:left;color:var(--muted);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);}
+.aa-table td{padding:12px 14px;border-bottom:1px solid rgba(255,255,255,0.05);}
+.aa-table tr:last-child td{border-bottom:none;}
+.aa-table tr:hover td{background:rgba(255,255,255,0.03);}
+.badge{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;}
+.badge-success{background:rgba(34,197,94,0.15);color:#4ade80;}
+.badge-warning{background:rgba(251,191,36,0.15);color:#fbbf24;}
+.badge-danger{background:rgba(248,113,113,0.15);color:#f87171;}
+.badge-info{background:rgba(96,165,250,0.15);color:#60a5fa;}
+.empty-state{text-align:center;padding:48px;color:var(--muted);}
+.empty-state i{font-size:48px;opacity:0.3;margin-bottom:12px;display:block;}
+.btn{padding:9px 18px;border-radius:9px;border:none;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:7px;}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#0d1b2a;}
+.btn-primary:hover{box-shadow:0 4px 12px rgba(240,165,0,0.3);transform:translateY(-1px);}
+.btn-outline{background:rgba(255,255,255,0.05);color:#fff;border:1px solid var(--border);}
+.btn-outline:hover{background:rgba(255,255,255,0.1);}
+.btn-danger{background:rgba(239,68,68,0.15);color:#f87171;border:1px solid rgba(239,68,68,0.2);}
+.btn-sm{padding:6px 12px;font-size:12px;}
+.btn:disabled{opacity:0.5;cursor:not-allowed;}
+.note-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;}
+.note-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;transition:all .2s;cursor:pointer;}
+.note-card:hover{border-color:rgba(240,165,0,0.35);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,0.3);}
+.note-icon{font-size:32px;margin-bottom:12px;}
+.note-title{font-size:14px;font-weight:700;margin-bottom:4px;}
+.note-meta{font-size:11px;color:var(--muted);line-height:1.6;}
+.note-expire{font-size:10px;color:#fb923c;margin-top:6px;font-weight:600;}
+.quiz-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:22px;display:flex;align-items:center;gap:16px;margin-bottom:12px;transition:all .2s;}
+.quiz-card:hover{border-color:rgba(96,165,250,0.3);}
+.quiz-icon{width:52px;height:52px;border-radius:12px;background:rgba(96,165,250,0.1);display:flex;align-items:center;justify-content:center;font-size:22px;color:#60a5fa;flex-shrink:0;}
+.quiz-actions{margin-left:auto;display:flex;gap:8px;flex-shrink:0;}
+.cbt-overlay{display:none;position:fixed;inset:0;background:#0d1b2a;z-index:9999;flex-direction:column;}
+.cbt-header{background:var(--bg2);border-bottom:1px solid var(--border);padding:16px 28px;display:flex;align-items:center;gap:16px;}
+.cbt-title{font-size:18px;font-weight:700;flex:1;}
+.cbt-timer{font-size:20px;font-weight:800;color:var(--accent);font-variant-numeric:tabular-nums;}
+.cbt-timer.danger{color:#f87171;animation:pulse 1s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.6;}}
+.cbt-body{flex:1;overflow-y:auto;padding:32px;max-width:800px;margin:0 auto;width:100%;}
+.cbt-q-nav{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:28px;}
+.cbt-q-btn{width:38px;height:38px;border-radius:8px;border:1.5px solid var(--border);background:transparent;color:var(--muted);font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;}
+.cbt-q-btn.answered{background:rgba(240,165,0,0.15);border-color:var(--accent);color:var(--accent);}
+.cbt-q-btn.current{background:var(--accent);border-color:var(--accent);color:#0d1b2a;}
+.cbt-question-box{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:28px;}
+.cbt-q-num{font-size:12px;color:var(--muted);font-weight:600;margin-bottom:8px;}
+.cbt-q-text{font-size:16px;font-weight:600;line-height:1.6;margin-bottom:24px;}
+.cbt-option{display:flex;align-items:center;gap:14px;padding:14px 18px;border:1.5px solid var(--border);border-radius:10px;margin-bottom:10px;cursor:pointer;transition:all .2s;}
+.cbt-option:hover{border-color:rgba(240,165,0,0.4);background:rgba(240,165,0,0.04);}
+.cbt-option.selected{border-color:var(--accent);background:rgba(240,165,0,0.1);}
+.cbt-option-label{font-size:14px;font-weight:500;}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:1000;align-items:center;justify-content:center;padding:16px;}
+.modal-box{background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:36px;width:100%;max-width:500px;}
+.modal-title{font-size:20px;font-weight:700;margin-bottom:20px;}
+.form-label{display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:6px;}
+.form-input{width:100%;padding:11px 14px;background:rgba(255,255,255,0.06);border:1.5px solid var(--border);border-radius:9px;font-size:14px;font-family:'Inter',sans-serif;color:#fff;outline:none;transition:all .25s;}
+.form-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(240,165,0,0.12);}
+.form-group{margin-bottom:16px;}
+.result-ring{width:120px;height:120px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-direction:column;margin:0 auto 20px;}
+@media(max-width:768px){
+  .sidebar{
+    position:fixed;
+    top:0;
+    left:-250px;
+    bottom:0;
+    z-index:9999;
+    transition:left 0.3s ease;
+    box-shadow:2px 0 10px rgba(0,0,0,0.5);
+  }
+  .sidebar.show{left:0;}
+  .page{padding:16px;}
+  .mobile-menu-btn{display:flex!important;}
+}
+.mobile-menu-btn{display:none;background:transparent;border:none;color:var(--text);font-size:20px;cursor:pointer;padding:8px;align-items:center;justify-content:center;}
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+  <div class="sidebar-brand">
+    <div class="sidebar-brand-icon"><i class="fa fa-graduation-cap" style="color:#0d1b2a;font-size:18px;"></i></div>
+    <div>
+      <div style="font-size:14px;font-weight:700;" id="sidebarSchoolName">School Portal</div>
+      <div style="font-size:11px;color:var(--muted);">Student Portal</div>
+    </div>
+  </div>
+  <div class="sidebar-user">
+    <div class="user-avatar" id="userAvatar">S</div>
+    <div>
+      <div style="font-size:13px;font-weight:600;" id="sidebarUserName">Student</div>
+      <div style="font-size:11px;color:var(--muted);" id="sidebarUserClass">Class</div>
+    </div>
+  </div>
+  <div style="overflow-y:auto;flex:1;">
+    <div class="nav-section">Main</div>
+    <div class="nav-item active" onclick="showPage('pg-home')" id="nav-home"><i class="fa fa-home"></i> Dashboard</div>
+    <div class="nav-section">Learning</div>
+    <div class="nav-item" onclick="showPage('pg-assignments')" id="nav-assignments"><i class="fa fa-clipboard-list"></i> Assignments <span class="nav-badge" id="assignBadge" style="display:none;">0</span></div>
+    <div class="nav-item" onclick="showPage('pg-notes')" id="nav-notes"><i class="fa fa-file-alt"></i> Lesson Notes</div>
+    <div class="nav-item" onclick="showPage('pg-cbt')" id="nav-cbt"><i class="fa fa-tasks"></i> CBT Quizzes</div>
+    <div class="nav-section">Account</div>
+    <div class="nav-item" onclick="showPage('pg-password')" id="nav-password"><i class="fa fa-lock"></i> Change Password</div>
+  </div>
+  <div class="sidebar-footer">
+    <div class="nav-item" onclick="doLogout()" style="border-left:none;"><i class="fa fa-sign-out-alt"></i> Logout</div>
+  </div>
+</div>
+
+<div class="main">
+  <div class="topbar">
+    <button class="mobile-menu-btn" onclick="document.querySelector('.sidebar').classList.toggle('show')"><i class="fa fa-bars"></i></button>
+    <div class="topbar-title" id="topbarTitle">Dashboard</div>
+    <div id="topbarSession" style="font-size:12px;color:var(--muted);"></div>
+  </div>
+
+  <div class="page active" id="pg-home">
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-icon" style="background:rgba(240,165,0,0.15);color:var(--accent);"><i class="fa fa-clipboard-list"></i></div><div><div class="stat-val" id="statAssign">0</div><div class="stat-lbl">Active Assignments</div></div></div>
+      <div class="stat-card"><div class="stat-icon" style="background:rgba(96,165,250,0.15);color:#60a5fa;"><i class="fa fa-file-alt"></i></div><div><div class="stat-val" id="statNotes">0</div><div class="stat-lbl">Lesson Notes</div></div></div>
+      <div class="stat-card"><div class="stat-icon" style="background:rgba(167,139,250,0.15);color:#a78bfa;"><i class="fa fa-tasks"></i></div><div><div class="stat-val" id="statQuiz">0</div><div class="stat-lbl">Available Quizzes</div></div></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title"><i class="fa fa-bell" style="color:var(--accent);margin-right:8px;"></i>Recent Assignments</span></div>
+      <div class="card-body" id="homeAssignments"><div class="empty-state"><i class="fa fa-clipboard"></i><p>No assignments yet</p></div></div>
+    </div>
+  </div>
+
+  <div class="page" id="pg-assignments">
+    <div class="card">
+      <div class="card-header"><span class="card-title"><i class="fa fa-clipboard-list" style="color:var(--accent);margin-right:8px;"></i>My Assignments</span><button class="btn btn-outline btn-sm" onclick="loadAssignments()"><i class="fa fa-sync"></i> Refresh</button></div>
+      <div class="card-body" id="assignmentsList"><div class="empty-state"><i class="fa fa-spinner fa-spin"></i><p>Loading...</p></div></div>
+    </div>
+  </div>
+
+  <div class="page" id="pg-notes">
+    <div class="card">
+      <div class="card-header"><span class="card-title"><i class="fa fa-file-alt" style="color:#60a5fa;margin-right:8px;"></i>Lesson Notes</span><button class="btn btn-outline btn-sm" onclick="loadNotes()"><i class="fa fa-sync"></i> Refresh</button></div>
+      <div class="card-body"><div class="note-grid" id="notesList"><div class="empty-state"><i class="fa fa-spinner fa-spin"></i><p>Loading...</p></div></div></div>
+    </div>
+  </div>
+
+  <div class="page" id="pg-cbt">
+    <div class="card">
+      <div class="card-header"><span class="card-title"><i class="fa fa-tasks" style="color:#a78bfa;margin-right:8px;"></i>CBT Quizzes</span><button class="btn btn-outline btn-sm" onclick="loadQuizzes()"><i class="fa fa-sync"></i> Refresh</button></div>
+      <div class="card-body" id="quizzesList"><div class="empty-state"><i class="fa fa-spinner fa-spin"></i><p>Loading...</p></div></div>
+    </div>
+  </div>
+
+  <div class="page" id="pg-password">
+    <div class="card" style="max-width:480px;">
+      <div class="card-header"><span class="card-title"><i class="fa fa-lock" style="color:var(--accent);margin-right:8px;"></i>Change Password</span></div>
+      <div class="card-body">
+        <div class="form-group"><label class="form-label">Current Password</label><input type="password" class="form-input" id="pwdCurrent" placeholder="Enter current password"></div>
+        <div class="form-group"><label class="form-label">New Password</label><input type="password" class="form-input" id="pwdNew" placeholder="Min. 6 characters"></div>
+        <div class="form-group"><label class="form-label">Confirm New Password</label><input type="password" class="form-input" id="pwdConfirm" placeholder="Confirm new password"></div>
+        <button class="btn btn-primary" id="pwdBtn" onclick="doChangePasswordDash()"><i class="fa fa-shield-alt"></i> Change Password</button>
+        <div id="pwdMsg" style="margin-top:12px;font-size:13px;display:none;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CBT OVERLAY -->
+<div class="cbt-overlay" id="cbtOverlay">
+  <div class="cbt-header">
+    <div class="cbt-title" id="cbtQuizTitle">Quiz</div>
+    <div style="font-size:12px;color:var(--muted);margin-right:16px;"><i class="fa fa-question-circle"></i> <span id="cbtProgress">0/0</span></div>
+    <div class="cbt-timer" id="cbtTimer">30:00</div>
+    <button class="btn btn-danger btn-sm" onclick="confirmSubmit()" style="margin-left:16px;"><i class="fa fa-paper-plane"></i> Submit</button>
+  </div>
+  <div class="cbt-body">
+    <div class="cbt-q-nav" id="cbtQNav"></div>
+    <div class="cbt-question-box" id="cbtQuestionBox"></div>
+    <div style="display:flex;justify-content:space-between;margin-top:20px;">
+      <button class="btn btn-outline" id="cbtPrevBtn" onclick="cbtNav(-1)"><i class="fa fa-arrow-left"></i> Previous</button>
+      <button class="btn btn-primary" id="cbtNextBtn" onclick="cbtNav(1)">Next <i class="fa fa-arrow-right"></i></button>
+    </div>
+  </div>
+</div>
+
+<!-- ASSIGNMENT MODAL -->
+<div class="modal-overlay" id="assignDetailModal">
+  <div class="modal-box">
+    <div class="modal-title" id="assignDetailTitle">Assignment</div>
+    <div id="assignDetailBody" style="font-size:14px;line-height:1.8;color:var(--muted);"></div>
+    <div style="margin-top:24px;"><button class="btn btn-outline" onclick="closeModal('assignDetailModal')">Close</button></div>
+  </div>
+</div>
+
+<!-- RESULT MODAL -->
+<div class="modal-overlay" id="resultModal">
+  <div class="modal-box" style="text-align:center;">
+    <div class="modal-title">Quiz Result</div>
+    <div class="result-ring" id="resultRing"></div>
+    <div id="resultText" style="font-size:15px;color:var(--muted);margin-bottom:24px;"></div>
+    <button class="btn btn-primary" onclick="closeModal('resultModal');loadQuizzes()"><i class="fa fa-check"></i> Done</button>
+  </div>
+</div>
+
+<div id="toast" style="position:fixed;bottom:24px;right:24px;background:#1e3a5f;border:1px solid var(--border);color:#fff;padding:12px 20px;border-radius:12px;font-size:13px;font-weight:600;display:none;z-index:99999;max-width:320px;box-shadow:0 8px 24px rgba(0,0,0,0.4);"></div>
+
+<script src="api.js?v=3"></script>
+<script>
+var AA={token:null,user:null,settings:{}};
+var _assignments=[],_notes=[],_quizzes=[];
+var _cbtQuestions=[],_cbtAnswers={},_cbtIdx=0,_cbtAttemptId=null,_cbtTimer=null,_cbtSecs=0;
+
+(function init(){
+  var params=new URLSearchParams(window.location.search);
+  AA.token=params.get('token');
+  if(!AA.token){window.location.href='Login.html';return;}
+  runBackendAction('getCurrentUser',[AA.token]).then(function(r){
+    if(!r.success||r.role!=='student'){window.location.href='Login.html';return;}
+    AA.user=r.user;AA.settings=r.settings||{};
+    applyBranding();updateUserUI();loadAll();
+  }).catch(function(){window.location.href='Login.html';});
+})();
+
+function applyBranding(){
+  runBackendAction('getPublicBranding',[]).then(function(b){
+    if(b.school_name){document.title=b.school_name+' - Student Portal';document.getElementById('sidebarSchoolName').textContent=b.school_name;document.getElementById('topbarSession').textContent=(AA.settings.current_session||'')+' | Term '+(AA.settings.current_term||'');}
+  }).catch(function(){});
+}
+function updateUserUI(){
+  var u=AA.user;
+  var shield = u.isFinanciallyCleared ? ' <i class="fa fa-shield-alt text-gold" title="Financially Cleared" style="color:var(--aa-gold);"></i>' : '';
+  document.getElementById('sidebarUserName').innerHTML = (u.fullName||'Student') + shield;
+  document.getElementById('sidebarUserClass').textContent=u.className||'No Class';
+  document.getElementById('userAvatar').textContent=(u.fullName||'S').charAt(0).toUpperCase();
+}
+function loadAll(){loadAssignments();loadNotes();loadQuizzes();}
+function showPage(pageId) {
+    document.querySelectorAll('.page').forEach(function(el) { el.classList.remove('active'); });
+    document.getElementById(pageId).classList.add('active');
+    
+    document.querySelectorAll('.nav-item').forEach(function(el) { el.classList.remove('active'); });
+    var navId = 'nav-' + pageId.replace('pg-', '');
+    var navEl = document.getElementById(navId);
+    if(navEl) navEl.classList.add('active');
+    
+    var titles = {
+      'pg-home': 'Dashboard',
+      'pg-assignments': 'Assignments',
+      'pg-notes': 'Lesson Notes',
+      'pg-cbt': 'CBT Quizzes',
+      'pg-password': 'Change Password'
+    };
+    document.getElementById('topbarTitle').innerText = titles[pageId] || 'Portal';
+    
+    document.querySelector('.sidebar').classList.remove('show');
+}
+
+// Close sidebar when clicking outside
+document.addEventListener('click', function(e) {
+  var sidebar = document.querySelector('.sidebar');
+  var menuBtn = document.querySelector('.mobile-menu-btn');
+  if (sidebar && sidebar.classList.contains('show') && !sidebar.contains(e.target) && (!menuBtn || !menuBtn.contains(e.target))) {
+    sidebar.classList.remove('show');
+  }
+});
+function closeModal(id){document.getElementById(id).style.display='none';}
+function showToast(msg,type){
+  var el=document.getElementById('toast');
+  el.textContent=msg;
+  el.style.background=type==='error'?'#4c1010':type==='success'?'#0f3d1f':'#1e3a5f';
+  el.style.display='block';clearTimeout(el._t);
+  el._t=setTimeout(function(){el.style.display='none';},3500);
+}
+
+function loadAssignments(){
+  runBackendAction('studentGetAssignments',[AA.token]).then(function(r){
+    if(Array.isArray(r)){
+      _assignments=r;
+    } else {
+      _assignments=(r && r.success)?(r.data||[]):[];
+    }
+    renderAssignments();
+    var pending=_assignments.filter(function(a){return a.status!=='submitted';}).length;
+    document.getElementById('statAssign').textContent=pending;
+    var badge=document.getElementById('assignBadge');
+    if(pending>0){badge.textContent=pending;badge.style.display='';} else {badge.style.display='none';}
+    renderHomeAssignments();
+  }).catch(function(){renderAssignments();});
+}
+function renderAssignments(){
+  var el=document.getElementById('assignmentsList');
+  if(!_assignments.length){el.innerHTML='<div class="empty-state"><i class="fa fa-clipboard"></i><p>No assignments yet.</p></div>';return;}
+  var html='<table class="aa-table"><thead><tr><th>Title</th><th>Subject</th><th>Due Date</th><th>Teacher</th><th></th></tr></thead><tbody>';
+  _assignments.forEach(function(a){
+    var due=a.dueDate?new Date(a.dueDate).toLocaleDateString('en-GB'):'-';
+    var od=a.dueDate&&new Date(a.dueDate)<new Date()?'<span class="badge badge-danger" style="margin-left:6px;">Overdue</span>':'';
+    html+='<tr><td><strong>'+escHtml(a.title)+'</strong></td><td>'+escHtml(a.subjectName||'-')+'</td><td>'+due+od+'</td><td>'+escHtml(a.teacherName||'-')+'</td>';
+    html+='<td><button class="btn btn-outline btn-sm" onclick="viewAssignment(\''+a.id+'\')"><i class="fa fa-eye"></i> View</button></td></tr>';
+  });
+  el.innerHTML=html+'</tbody></table>';
+}
+function renderHomeAssignments(){
+  var el=document.getElementById('homeAssignments');
+  var r=_assignments.slice(0,5);
+  if(!r.length){el.innerHTML='<div class="empty-state"><i class="fa fa-clipboard"></i><p>No assignments yet</p></div>';return;}
+  var html='<table class="aa-table"><thead><tr><th>Title</th><th>Subject</th><th>Due</th></tr></thead><tbody>';
+  r.forEach(function(a){
+    var due=a.dueDate?new Date(a.dueDate).toLocaleDateString('en-GB'):'-';
+    html+='<tr onclick="viewAssignment(\''+a.id+'\')" style="cursor:pointer;"><td><strong>'+escHtml(a.title)+'</strong></td><td>'+escHtml(a.subjectName||'-')+'</td><td>'+due+'</td></tr>';
+  });
+  el.innerHTML=html+'</tbody></table>';
+}
+function viewAssignment(id){
+  var a=_assignments.find(function(x){return x.id===id;});if(!a)return;
+  document.getElementById('assignDetailTitle').textContent=a.title;
+  var html='<p><strong>Subject:</strong> '+escHtml(a.subjectName||'All')+'</p>';
+  html+='<p style="margin-top:8px;"><strong>Teacher:</strong> '+escHtml(a.teacherName||'-')+'</p>';
+  if(a.dueDate)html+='<p style="margin-top:8px;"><strong>Due Date:</strong> '+new Date(a.dueDate).toLocaleDateString('en-GB')+'</p>';
+  html+='<hr style="border-color:var(--border);margin:16px 0;"><div style="white-space:pre-wrap;line-height:1.8;">'+escHtml(a.description||'No description.')+'</div>';
+  document.getElementById('assignDetailBody').innerHTML=html;
+  document.getElementById('assignDetailModal').style.display='flex';
+}
+
+function loadNotes(){
+  runBackendAction('studentGetNotes',[AA.token]).then(function(r){
+    // api.js unwraps {success,data} -> r is the raw array if success, or the full object if failed
+    if(Array.isArray(r)){
+      _notes=r;
+    } else {
+      _notes=(r && r.success)?(r.data||[]):[];
+    }
+    renderNotes();
+    document.getElementById('statNotes').textContent=_notes.length;
+  }).catch(function(){renderNotes();});
+}
+function renderNotes(){
+  var el=document.getElementById('notesList');
+  if(!_notes.length){el.innerHTML='<div class="empty-state"><i class="fa fa-file-alt"></i><p>No lesson notes yet.</p></div>';return;}
+  var html='';
+  _notes.forEach(function(n){
+    var icon=(n.mimeType||'').indexOf('pdf')>-1?'&#128196;':'&#128203;';
+    var created=n.createdAt?new Date(n.createdAt):null;
+    var expires=n.expiresAt?new Date(n.expiresAt):null;
+    var expStr=expires?'Expires: '+expires.toLocaleDateString('en-GB'):'';
+    html+='<div class="note-card" onclick="openNote(\''+n.id+'\')">';
+    html+='<div class="note-icon">'+icon+'</div>';
+    html+='<div class="note-title">'+escHtml(n.title)+'</div>';
+    html+='<div class="note-meta">'+escHtml(n.subjectName||'')+'<br>'+escHtml(n.teacherName||'')+(created?' &bull; '+created.toLocaleDateString('en-GB'):'')+'</div>';
+    if(expStr)html+='<div class="note-expire"><i class="fa fa-clock"></i> '+expStr+'</div>';
+    html+='</div>';
+  });
+  el.innerHTML=html;
+}
+function openNote(id){
+  showToast('Loading note...','info');
+  runBackendAction('studentGetNoteFile',[AA.token,id]).then(function(r){
+    if(!r.success){showToast(r.message||'Could not load note.','error');return;}
+    var dataUrl='data:'+(r.mimeType||'application/pdf')+';base64,'+r.fileData;
+    if(r.mimeType&&r.mimeType.indexOf('pdf')>-1){
+      var w=window.open('','_blank');
+      w.document.write('<html><body style="margin:0;"><embed src="'+dataUrl+'" width="100%" height="100%" type="application/pdf"></body></html>');
+    }else{
+      var a=document.createElement('a');a.href=dataUrl;a.download=r.fileName||'note';a.click();
+    }
+  }).catch(function(){showToast('Connection error.','error');});
+}
+
+function loadQuizzes(){
+  runBackendAction('studentGetQuizzes',[AA.token]).then(function(r){
+    if(Array.isArray(r)){
+      _quizzes=r;
+    } else {
+      _quizzes=(r && r.success)?(r.data||[]):[];
+    }
+    renderQuizzes();
+    var av=_quizzes.filter(function(q){return q.isPublished&&!q.attemptResult;}).length;
+    document.getElementById('statQuiz').textContent=av;
+  }).catch(function(){renderQuizzes();});
+}
+function renderQuizzes(){
+  var el=document.getElementById('quizzesList');
+  if(!_quizzes.length){el.innerHTML='<div class="empty-state"><i class="fa fa-tasks"></i><p>No quizzes assigned yet.</p></div>';return;}
+  var html='';
+  _quizzes.forEach(function(q){
+    html+='<div class="quiz-card"><div class="quiz-icon"><i class="fa fa-tasks"></i></div>';
+    html+='<div style="flex:1;"><div style="font-size:15px;font-weight:700;">'+escHtml(q.title)+'</div>';
+    html+='<div style="font-size:12px;color:var(--muted);margin-top:3px;">'+escHtml(q.subjectName||'')+' &bull; '+(q.durationMinutes||30)+' mins</div>';
+    if(!q.isPublished) html+='<span class="badge badge-warning" style="margin-top:4px;">Not Available Yet</span>';
+    if(q.attemptResult) html+='<span class="badge badge-success" style="margin-top:4px;"><i class="fa fa-check"></i> Score: '+q.attemptResult.score+'/'+q.attemptResult.total+' ('+q.attemptResult.percentage+'%)</span>';
+    else if(q.timeLocked) {
+      if(q.timeLockedReason === 'starts_later') {
+        var startStr = new Date(q.availableFrom).toLocaleString();
+        html+='<span class="badge badge-primary" style="margin-top:4px;"><i class="fa fa-clock"></i> Starts: '+startStr+'</span>';
+      } else {
+        html+='<span class="badge badge-danger" style="margin-top:4px;"><i class="fa fa-times"></i> Quiz Ended</span>';
+      }
+    }
+    
+    html+='</div><div class="quiz-actions">';
+    if(q.isPublished && !q.attemptResult && !q.timeLocked) html+='<button class="btn btn-primary btn-sm" onclick="startQuiz(\''+q.id+'\')"><i class="fa fa-play"></i> Take Quiz</button>';
+    else if(!q.isPublished || (q.timeLocked && q.timeLockedReason === 'starts_later')) html+='<button class="btn btn-outline btn-sm" disabled><i class="fa fa-lock"></i> Locked</button>';
+    else if(q.timeLocked && q.timeLockedReason === 'ended' && !q.attemptResult) html+='<button class="btn btn-outline btn-sm" disabled><i class="fa fa-times"></i> Missed</button>';
+    else html+='<button class="btn btn-outline btn-sm" disabled><i class="fa fa-check"></i> Completed</button>';
+    html+='</div></div>';
+  });
+  el.innerHTML=html;
+}
+
+function shuffleArray(arr) {
+  for (var i = arr.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var tmp = arr[i]; arr[i] = arr[j]; arr[j] = tmp;
+  }
+  return arr;
+}
+function startQuiz(quizId){
+  showToast('Loading quiz...','info');
+  runBackendAction('studentStartQuiz',[AA.token,quizId]).then(function(r){
+    if(!r.success){
+      if(r.alreadyAttempted)showToast('Already attempted. Score: '+r.score+'/'+r.total,'info');
+      else if(r.financeLocked) {
+        var lockDiv = document.getElementById('financeLockBanner');
+        if (!lockDiv) {
+          lockDiv = document.createElement('div');
+          lockDiv.id = 'financeLockBanner';
+          lockDiv.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9998;display:flex;align-items:center;justify-content:center;padding:20px;';
+          var msg = r.message || 'CBT access is currently restricted due to an outstanding fee balance.';
+          lockDiv.innerHTML = '<div style="background:#1e293b;border:2px solid #ef4444;border-radius:16px;padding:36px;max-width:480px;width:100%;text-align:center;">'
+            + '<div style="font-size:48px;margin-bottom:12px;">🔒</div>'
+            + '<h2 style="color:#ef4444;margin:0 0 8px;">Finance Hold</h2>'
+            + '<p style="color:#94a3b8;margin-bottom:20px;">' + msg + '</p>'
+            + '<div style="background:#0f172a;border-radius:10px;padding:16px;margin-bottom:24px;">'
+            + '<div style="color:#94a3b8;font-size:13px;">Outstanding Balance</div>'
+            + '<div style="color:#ef4444;font-size:28px;font-weight:800;margin-top:4px;">&#8358;'+Number(r.outstandingAmount||0).toLocaleString()+'</div>'
+            + '</div>'
+            + '<p style="color:#64748b;font-size:13px;margin-bottom:20px;">Please contact the accounts office to resolve your account before taking assessments.</p>'
+            + '<button onclick="document.getElementById(\'financeLockBanner\').remove()" style="background:#3b82f6;color:#fff;border:none;border-radius:8px;padding:12px 28px;font-size:14px;cursor:pointer;font-weight:600;">Close</button>'
+            + '</div>';
+          document.body.appendChild(lockDiv);
+        } else { lockDiv.style.display = 'flex'; }
+      }
+      else showToast(r.message||'Could not start quiz.','error');
+      return;
+    }
+    var questions = r.questions;
+    // Client-side option shuffle: permute A/B/C/D display but record original letter
+    if (r.quiz && r.quiz.shuffleOptions !== false) {
+      questions = questions.map(function(q) {
+        var opts = shuffleArray([['A', q.optionA], ['B', q.optionB], ['C', q.optionC], ['D', q.optionD]]);
+        return {
+          id: q.id,
+          question: q.question,
+          // _opts stores [{displayLabel, originalLetter, text}]
+          _opts: opts.map(function(o, idx) {
+            return { display: String.fromCharCode(65 + idx), original: o[0], text: o[1] };
+          })
+        };
+      });
+    }
+    _cbtQuestions=questions;
+    _cbtAnswers=r.savedAnswers || {};
+    _cbtIdx=0;
+    _cbtAttemptId=r.attemptId;
+    _cbtSubmitting=false;
+    _cbtSecs=(r.savedSecs !== undefined && r.savedSecs !== null) ? r.savedSecs : (r.quiz.durationMinutes||30)*60;
+    document.getElementById('cbtQuizTitle').textContent=r.quiz.title;
+    document.getElementById('cbtProgress').textContent='1/'+_cbtQuestions.length;
+    document.getElementById('cbtOverlay').style.display='flex';
+    renderCBTNav();renderCBTQuestion();startCBTTimer();
+  }).catch(function(){showToast('Connection error.','error');});
+}
+function renderCBTNav(){
+  var html='';
+  _cbtQuestions.forEach(function(q,i){
+    var cls=i===_cbtIdx?'current':(_cbtAnswers[q.id]?'answered':'');
+    html+='<button class="cbt-q-btn '+cls+'" onclick="jumpCBT('+i+')">'+(i+1)+'</button>';
+  });
+  document.getElementById('cbtQNav').innerHTML=html;
+}
+function renderCBTQuestion(){
+  var q=_cbtQuestions[_cbtIdx];if(!q)return;
+  document.getElementById('cbtProgress').textContent=(_cbtIdx+1)+'/'+_cbtQuestions.length;
+  // Support both shuffled (_opts) and unshuffled (optionA-D) question formats
+  var opts;
+  if (q._opts) {
+    opts = q._opts.map(function(o) { return [o.original, o.display, o.text]; });
+  } else {
+    opts = [['A','A',q.optionA],['B','B',q.optionB],['C','C',q.optionC],['D','D',q.optionD]];
+  }
+  var html='<div class="cbt-q-num">Question '+(_cbtIdx+1)+' of '+_cbtQuestions.length+'</div>';
+  html+='<div class="cbt-q-text">'+escHtml(q.question)+'</div>';
+  
+  if(q.imageUrl) {
+    var displaySrc = q.imageUrl.startsWith('data:image') ? q.imageUrl : ('data:image/jpeg;base64,' + q.imageUrl);
+    if(q.imageUrl.startsWith('http')) displaySrc = q.imageUrl;
+    html+='<div style="margin:16px 0;text-align:center;"><img src="'+displaySrc+'" style="max-width:100%;max-height:200px;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.1);"></div>';
+  }
+  opts.forEach(function(o){
+    var origLetter=o[0]; var displayLabel=o[1]; var text=o[2];
+    var sel=_cbtAnswers[q.id]===origLetter?'selected':'';
+    
+    // Strip leading A-D prefixes from the text to avoid "A. (D) monitor"
+    var cleanText = String(text).replace(/^([a-d][\.\)]\s*|\([a-d]\)\s*)/i, '');
+    if (!cleanText.trim()) cleanText = text;
+
+    html+='<label class="cbt-option '+sel+'" onclick="selectAnswer(\''+q.id+'\',\''+origLetter+'\')">';
+    html+='<input type="radio" name="opt" value="'+origLetter+'" '+(sel?'checked':'')+' style="pointer-events:none;">';
+    html+='<div class="cbt-option-label"><strong>'+displayLabel+'.</strong> '+escHtml(cleanText)+'</div></label>';
+  });
+  document.getElementById('cbtQuestionBox').innerHTML=html;
+  document.getElementById('cbtPrevBtn').disabled=_cbtIdx===0;
+  document.getElementById('cbtNextBtn').textContent=_cbtIdx===_cbtQuestions.length-1?'Review':'Next \u203a';
+}
+function selectAnswer(qId,opt){_cbtAnswers[qId]=opt;renderCBTNav();renderCBTQuestion();}
+function cbtNav(dir){
+  if (_cbtIdx === _cbtQuestions.length - 1 && dir === 1) {
+    for (var i = 0; i < _cbtQuestions.length; i++) {
+      if (!_cbtAnswers[_cbtQuestions[i].id]) { jumpCBT(i); return; }
+    }
+    jumpCBT(0); return;
+  }
+  _cbtIdx=Math.max(0,Math.min(_cbtQuestions.length-1,_cbtIdx+dir));
+  renderCBTNav();
+  renderCBTQuestion();
+}
+function jumpCBT(i){_cbtIdx=i;renderCBTNav();renderCBTQuestion();}
+function startCBTTimer(){
+  clearInterval(_cbtTimer);
+  _cbtTimer=setInterval(function(){
+    _cbtSecs--;
+    var m=Math.floor(_cbtSecs/60),s=_cbtSecs%60;
+    document.getElementById('cbtTimer').textContent=String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+    if(_cbtSecs<=60)document.getElementById('cbtTimer').classList.add('danger');
+    if(_cbtSecs<=0){clearInterval(_cbtTimer);submitQuiz();}
+  },1000);
+}
+function confirmSubmit(){
+  var ans=Object.keys(_cbtAnswers).length,tot=_cbtQuestions.length;
+  if(ans<tot){
+    _cbtSubmitting = true;
+    var c = confirm('You answered '+ans+'/'+tot+'. Submit anyway?');
+    _cbtSubmitting = false;
+    if (!c) return;
+  }
+  submitQuiz();
+}
+function submitQuiz(){
+  _cbtSubmitting=true;
+  clearInterval(_cbtTimer);
+  var answers=_cbtQuestions.map(function(q){return{questionId:q.id,selectedOption:_cbtAnswers[q.id]||null};});
+  runBackendAction('studentSubmitQuiz',[AA.token,_cbtAttemptId,answers]).then(function(r){
+    document.getElementById('cbtOverlay').style.display='none';
+    if(r.success){
+      var pct=r.percentage;
+      var color=pct>=70?'#4ade80':pct>=50?'#fbbf24':'#f87171';
+      document.getElementById('resultRing').style.cssText='width:120px;height:120px;border-radius:50%;background:conic-gradient('+color+' '+pct+'%, rgba(255,255,255,0.05) 0);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;';
+      document.getElementById('resultRing').innerHTML='<div style="background:var(--bg3);width:90px;height:90px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;"><div style="font-size:24px;font-weight:800;color:'+color+';">'+pct+'%</div><div style="font-size:11px;color:var(--muted);">Score</div></div>';
+      document.getElementById('resultText').textContent='You scored '+r.score+' out of '+r.total+' questions.';
+      document.getElementById('resultModal').style.display='flex';
+    }else{showToast(r.message||'Submission failed.','error');}
+  }).catch(function(){showToast('Error submitting quiz.','error');});
+}
+
+function doChangePasswordDash(){
+  var cur=document.getElementById('pwdCurrent').value;
+  var nw=document.getElementById('pwdNew').value;
+  var cf=document.getElementById('pwdConfirm').value;
+  var msg=document.getElementById('pwdMsg');msg.style.display='none';
+  if(!cur||!nw){msg.textContent='All fields required.';msg.style.color='#fca5a5';msg.style.display='block';return;}
+  if(nw.length<6){msg.textContent='Min. 6 characters.';msg.style.color='#fca5a5';msg.style.display='block';return;}
+  if(nw!==cf){msg.textContent='Passwords do not match.';msg.style.color='#fca5a5';msg.style.display='block';return;}
+  var btn=document.getElementById('pwdBtn');btn.disabled=true;btn.innerHTML='<i class="fa fa-spinner fa-spin"></i> Saving...';
+  runBackendAction('studentChangePassword',[AA.token,cur,nw]).then(function(r){
+    btn.disabled=false;btn.innerHTML='<i class="fa fa-shield-alt"></i> Change Password';
+    msg.textContent=r.message||(r.success?'Password changed!':'Error.');msg.style.color=r.success?'#4ade80':'#fca5a5';msg.style.display='block';
+    if(r.success)setTimeout(function(){window.location.href='Login.html';},2000);
+  }).catch(function(){btn.disabled=false;btn.innerHTML='<i class="fa fa-shield-alt"></i> Change Password';msg.textContent='Connection error.';msg.style.color='#fca5a5';msg.style.display='block';});
+}
+function doLogout(){runBackendAction('logoutUser',[AA.token]).finally(function(){window.location.href='Login.html';});}
+function escHtml(s){if(s===null||s===undefined)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+function handleCBTBlur() {
+  if (document.getElementById('cbtOverlay') && document.getElementById('cbtOverlay').style.display === 'flex' && !_cbtSubmitting) {
+    _cbtSubmitting = true;
+    var answersArray = _cbtQuestions.map(function(q){return{questionId:q.id,selectedOption:_cbtAnswers[q.id]||null};});
+    runBackendAction('studentSaveQuizProgress', [AA.token, _cbtAttemptId, answersArray, _cbtSecs]).then(function() {
+      alert("Anti-Cheat Warning: You have been logged out because the quiz window lost focus (e.g. minimized or switched tabs). Your progress has been saved.");
+      localStorage.removeItem('token');
+      sessionStorage.removeItem('token');
+      window.location.href = "Login.html";
+    }).catch(function() {
+      localStorage.removeItem('token');
+      sessionStorage.removeItem('token');
+      window.location.href = "Login.html";
+    });
+  }
+}
+window.addEventListener('blur', handleCBTBlur);
+document.addEventListener('visibilitychange', function() {
+  if (document.hidden) handleCBTBlur();
+});
+</script>
+</body>
+</html>
+

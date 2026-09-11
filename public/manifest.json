@@ -1,0 +1,17 @@
+{
+  "name": "Resolute Private School Portal",
+  "short_name": "VictorySpring",
+  "description": "School Management Portal for Resolute Private School",
+  "start_url": "./Login.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0a192f",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "192x192 512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

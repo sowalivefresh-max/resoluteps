@@ -1,0 +1,1331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="manifest" href="manifest.json" />
+    <meta name="theme-color" content="#0a192f" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <link rel="apple-touch-icon" href="icon.png" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="aa-layout">
+    <div class="aa-sidebar-overlay" id="aa-sidebar-overlay"></div>
+    <aside class="aa-sidebar" id="aa-sidebar">
+      <div class="aa-sidebar-brand">
+        <div class="aa-brand-icon">AA</div>
+        <div class="aa-brand-text">
+          <div class="aa-brand-name" id="sb-school-name">Loading\u2026</div>
+          <div class="aa-brand-role">Accounts Officer</div>
+        </div>
+      </div>
+      <nav class="aa-nav">
+        <div class="aa-nav-section">Main</div>
+        <button class="aa-nav-item active" id="nav-dashboard" onclick="switchTab('acc-tabs', 'tab-dashboard'); setActiveNav('nav-dashboard')">
+          <i class="fa fa-chart-line"></i> Dashboard
+        </button>
+        <div class="aa-nav-section">Finance</div>
+        <button class="aa-nav-item" id="nav-fees" onclick="switchTab('acc-tabs', 'tab-fees'); setActiveNav('nav-fees')">
+          <i class="fa fa-money-check-alt"></i> Fee Structure
+        </button>
+        <button class="aa-nav-item" id="nav-bills" onclick="switchTab('acc-tabs', 'tab-bills'); setActiveNav('nav-bills')">
+          <i class="fa fa-file-invoice"></i> Bills & Payments
+        </button>
+        <button class="aa-nav-item" id="nav-expenses" onclick="switchTab('acc-tabs', 'tab-expenses'); setActiveNav('nav-expenses')">
+          <i class="fa fa-receipt"></i> Expenses
+        </button>
+        <button class="aa-nav-item" id="nav-store-payments" onclick="switchTab('acc-tabs', 'tab-store-payments'); setActiveNav('nav-store-payments'); loadStorePaymentsTab();">
+          <i class="fa fa-shopping-cart"></i> Store Payments
+        </button>
+        <button class="aa-nav-item" id="nav-plans" onclick="switchTab('acc-tabs', 'tab-plans'); setActiveNav('nav-plans'); loadInstallmentPlans();">
+          <i class="fa fa-calendar-alt"></i> Payment Plans
+        </button>
+        <div class="aa-nav-section">Settings</div>
+        <button class="aa-nav-item" id="nav-compliance" onclick="switchTab('acc-tabs', 'tab-compliance'); setActiveNav('nav-compliance'); loadComplianceSettings();">
+          <i class="fa fa-shield-alt"></i> Compliance Rules
+        </button>
+        <button class="aa-nav-item text-danger" onclick="AA.logout()">
+          <i class="fa fa-sign-out-alt"></i> Logout
+        </button>
+      </nav>
+      <div class="aa-sidebar-footer">
+        <div class="aa-user-card" onclick="AA.populateProfileModal()">
+          <div class="aa-user-avatar">AC</div>
+          <div>
+            <div class="aa-user-name">Loading...</div>
+            <div class="aa-user-role">Accounts Officer</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <main class="aa-main">
+      <header class="aa-topbar">
+        <button class="aa-menu-toggle" id="aa-menu-toggle"><i class="fa fa-bars"></i></button>
+        <div class="aa-topbar-left">
+          <div class="aa-topbar-title">Accounts Office</div>
+          <div class="aa-topbar-subtitle" id="currentTermText">Academic Session</div>
+        </div>
+        <div class="aa-topbar-right">
+          <button class="aa-btn aa-btn-outline" onclick="sendReminders()"><i class="fa fa-envelope"></i> Send Reminders</button>
+        </div>
+      </header>
+
+      <div class="aa-content">
+        <div id="acc-tabs" style="display:none;">
+          <div class="aa-tab active" data-tab="tab-dashboard" data-onload="loadDashboard"></div>
+          <div class="aa-tab" data-tab="tab-fees" data-onload="loadFeeStructures"></div>
+          <div class="aa-tab" data-tab="tab-bills" data-onload="loadBills"></div>
+          <div class="aa-tab" data-tab="tab-expenses" data-onload="loadExpenses"></div>
+          <div class="aa-tab" data-tab="tab-store-payments" data-onload="loadStorePaymentsTab"></div>
+          <div class="aa-tab" data-tab="tab-plans"></div>
+          <div class="aa-tab" data-tab="tab-compliance"></div>
+        </div>
+
+        <!-- TAB: Dashboard -->
+        <div class="aa-tab-content active" data-group="acc-tabs" data-id="tab-dashboard">
+          <div class="aa-grid-4 mb-4">
+            <div class="aa-stat-card">
+              <div class="aa-stat-icon bg-info"><i class="fa fa-file-invoice-dollar"></i></div>
+              <div class="aa-stat-value" id="stat-billed">-</div>
+              <div class="aa-stat-label">Total Billed</div>
+            </div>
+            <div class="aa-stat-card">
+              <div class="aa-stat-icon bg-success"><i class="fa fa-wallet"></i></div>
+              <div class="aa-stat-value" id="stat-collected">-</div>
+              <div class="aa-stat-label">Total Collected</div>
+            </div>
+            <div class="aa-stat-card">
+              <div class="aa-stat-icon bg-danger"><i class="fa fa-hand-holding-usd"></i></div>
+              <div class="aa-stat-value" id="stat-outstanding">-</div>
+              <div class="aa-stat-label">Outstanding Balance</div>
+            </div>
+            <div class="aa-stat-card">
+              <div class="aa-stat-icon bg-warning"><i class="fa fa-receipt"></i></div>
+              <div class="aa-stat-value" id="stat-expenses">-</div>
+              <div class="aa-stat-label">Total Expenses</div>
+            </div>
+          </div>
+          
+          <div class="aa-grid-2">
+            <div class="aa-card">
+              <div class="aa-card-header">
+                <h3 class="aa-card-title">Top Debtors</h3>
+                <button class="aa-btn aa-btn-primary aa-btn-sm" onclick="downloadDebtorsReport()"><i class="fa fa-download"></i> Export CSV</button>
+              </div>
+              <div class="aa-card-body" style="padding:0;">
+                <table class="aa-table" id="debtorsTable">
+                  <thead><tr><th>Student Name</th><th>Class</th><th>Balance</th></tr></thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+            </div>
+            <div class="aa-card">
+              <div class="aa-card-header"><h3 class="aa-card-title">Income vs Expenses (Net Balance)</h3></div>
+              <div class="aa-card-body text-center" style="padding:40px 20px;">
+                <div style="font-size:36px;font-weight:700;color:var(--aa-navy);" id="stat-net">-</div>
+                <div class="text-muted mt-2">Net Balance for Current Term</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB: Fee Structure -->
+        <div class="aa-tab-content" data-group="acc-tabs" data-id="tab-fees">
+          <div class="aa-card">
+            <div class="aa-card-header">
+              <h3 class="aa-card-title">Fee Structures</h3>
+              <button class="aa-btn aa-btn-primary" onclick="openNewFeeModal()"><i class="fa fa-plus"></i> Add Structure</button>
+            </div>
+            <div class="aa-card-body" style="padding:0;">
+              <table class="aa-table" id="feesTable">
+                <thead><tr><th>Class</th><th>Section</th><th>Fee Components</th><th>Total</th><th>Actions</th></tr></thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB: Bills & Payments -->
+        <div class="aa-tab-content" data-group="acc-tabs" data-id="tab-bills">
+          <div class="aa-card mb-4">
+            <div class="aa-card-body">
+              <div class="d-flex justify-content-between align-items-center">
+                <div class="aa-search-box" style="width:300px;">
+                  <i class="fa fa-search"></i>
+                  <input type="text" id="searchBills" class="aa-input" placeholder="Search by student or class..." onkeyup="filterTable('searchBills','billsTable')">
+                </div>
+                <div class="d-flex gap-2">
+                  <button class="aa-btn aa-btn-outline" onclick="generateBills()"><i class="fa fa-magic"></i> Generate Term Bills</button>
+                  <button class="aa-btn aa-btn-primary" onclick="openModal('paymentModal');resetForm('paymentForm');"><i class="fa fa-plus"></i> Record Payment</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="aa-card mb-4" id="pendingPaymentsCard" style="display:none; border-color:var(--aa-warning);">
+            <div class="aa-card-header" style="background:rgba(217,119,6,.08);">
+              <h3 class="aa-card-title text-warning"><i class="fa fa-clock"></i> Pending Payments</h3>
+            </div>
+            <div class="aa-card-body" style="padding:0;">
+              <table class="aa-table" id="pendingPaymentsTable">
+                <thead><tr><th>Date</th><th>Student</th><th>Ref</th><th>Amount</th><th>Method</th><th>Action</th></tr></thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="aa-card">
+            <div class="aa-card-body" style="padding:0;">
+              <table class="aa-table" id="billsTable">
+                <thead><tr><th>Student Name</th><th>Class</th><th>Gross Fee</th><th>Discount</th><th>Net Billed</th><th>Paid</th><th>Balance</th><th>Status</th><th>Action</th></tr></thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB: Expenses -->
+        <div class="aa-tab-content" data-group="acc-tabs" data-id="tab-expenses">
+          <div class="aa-card">
+            <div class="aa-card-header">
+              <h3 class="aa-card-title">Expense Records</h3>
+              <button class="aa-btn aa-btn-primary" onclick="openModal('expenseModal');resetForm('expenseForm');"><i class="fa fa-plus"></i> Record Expense</button>
+            </div>
+            <div class="aa-card-body" style="padding:0;">
+              <table class="aa-table" id="expensesTable">
+                <thead><tr><th>Date</th><th>Category</th><th>Description</th><th>Amount</th><th>Actions</th></tr></thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB: Store Payments -->
+        <div class="aa-tab-content" data-group="acc-tabs" data-id="tab-store-payments">
+          <div class="aa-card">
+            <div class="aa-card-header">
+              <h3 class="aa-card-title">Record Store Payment</h3>
+              <p class="text-muted" style="margin:0; font-size:13px;">Logging a payment here will automatically notify the Storekeeper to issue the item(s) to the student.</p>
+            </div>
+            <div class="aa-card-body">
+              <form id="storePaymentForm" onsubmit="event.preventDefault(); saveStorePayment();">
+                <div class="aa-grid-2">
+                  <div class="aa-form-group">
+                    <label class="aa-label">Student (Select or Search)</label>
+                    <select id="spStudentSelect" class="aa-select" required></select>
+                  </div>
+                  <div class="aa-form-group">
+                    <label class="aa-label">Store Item</label>
+                    <select id="spItemSelect" class="aa-select" required onchange="updateStorePaymentAmount()"></select>
+                  </div>
+                </div>
+                <div class="aa-grid-3">
+                  <div class="aa-form-group">
+                    <label class="aa-label">Quantity</label>
+                    <input type="number" id="spQuantity" class="aa-input" min="1" value="1" required oninput="updateStorePaymentAmount()">
+                  </div>
+                  <div class="aa-form-group">
+                    <label class="aa-label">Amount Paid (&#8358;)</label>
+                    <input type="number" id="spAmount" class="aa-input" min="0" required>
+                  </div>
+                  <div class="aa-form-group">
+                    <label class="aa-label">Payment Method</label>
+                    <select id="spMethod" class="aa-select">
+                      <option value="Cash">Cash</option>
+                      <option value="Bank Transfer">Bank Transfer</option>
+                      <option value="POS">POS</option>
+                    </select>
+                  </div>
+                </div>
+                <button type="submit" class="aa-btn aa-btn-success"><i class="fa fa-check"></i> Record & Notify Storekeeper</button>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB: Installment Plans -->
+        <div class="aa-tab-content" data-group="acc-tabs" data-id="tab-plans">
+          <div class="aa-card mb-4">
+            <div class="aa-card-header">
+              <h3 class="aa-card-title"><i class="fa fa-calendar-alt"></i> Installment Payment Plans</h3>
+              <div style="display:flex;gap:8px;">
+                <select id="planFilterStatus" class="aa-select" style="width:auto;" onchange="loadInstallmentPlans()">
+                  <option value="">All Plans</option>
+                  <option value="pending">Pending</option>
+                  <option value="approved">Approved</option>
+                  <option value="rejected">Rejected</option>
+                </select>
+                <button class="aa-btn aa-btn-outline aa-btn-sm" onclick="loadInstallmentPlans()"><i class="fa fa-sync"></i> Refresh</button>
+              </div>
+            </div>
+            <div class="aa-card-body" style="padding:0;">
+              <table class="aa-table" id="plansTable">
+                <thead><tr><th>Student</th><th>Term</th><th>Total</th><th>Milestones</th><th>Status</th><th>Actions</th></tr></thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB: Compliance Rules -->
+        <div class="aa-tab-content" data-group="acc-tabs" data-id="tab-compliance">
+          <div class="aa-card mb-4">
+            <div class="aa-card-header"><h3 class="aa-card-title"><i class="fa fa-shield-alt"></i> Finance Compliance Rules</h3></div>
+            <div class="aa-card-body">
+              <div class="aa-alert aa-alert-info mb-4"><i class="fa fa-info-circle"></i><div>These rules control automatic access restrictions for students and parents with outstanding fee balances. All locks are <strong>OFF by default</strong>.</div></div>
+              <div class="aa-grid-2">
+                <div>
+                  <h4 style="color:var(--aa-primary);margin-bottom:16px;"><i class="fa fa-tasks"></i> CBT Assessment Lock</h4>
+                  <div class="aa-form-group"><label class="aa-label">Enable CBT Lock</label>
+                    <select id="cbt_lock_enabled" class="aa-select"><option value="false">OFF (Disabled)</option><option value="true">ON (Enabled)</option></select></div>
+                  <div class="aa-form-group"><label class="aa-label">Lock Threshold (% of bill outstanding)</label>
+                    <input type="number" id="cbt_lock_threshold" class="aa-input" min="0" max="100" placeholder="e.g. 50 = lock if 50% unpaid"></div>
+                </div>
+                <div>
+                  <h4 style="color:var(--aa-primary);margin-bottom:16px;"><i class="fa fa-file-alt"></i> Report Card Lock</h4>
+                  <div class="aa-form-group"><label class="aa-label">Enable Report Card Lock</label>
+                    <select id="report_lock_enabled" class="aa-select"><option value="false">OFF (Disabled)</option><option value="true">ON (Enabled)</option></select></div>
+                  <div class="aa-form-group"><label class="aa-label">Minimum Outstanding Balance to Lock (&#8358;)</label>
+                    <input type="number" id="report_lock_min_balance" class="aa-input" min="0" placeholder="e.g. 0 = lock on any balance, 5000 = only if owed > &#8358;5000"></div>
+                </div>
+              </div>
+              <hr style="margin:20px 0;">
+              <h4 style="color:var(--aa-primary);margin-bottom:16px;"><i class="fa fa-bolt"></i> Early Payment Discount</h4>
+              <div class="aa-grid-3">
+                <div class="aa-form-group"><label class="aa-label">Enable Early-Bird Discount</label>
+                  <select id="eb_enabled" class="aa-select"><option value="false">OFF</option><option value="true">ON</option></select></div>
+                <div class="aa-form-group"><label class="aa-label">Days from Bill Generation</label>
+                  <input type="number" id="eb_days" class="aa-input" min="1" placeholder="e.g. 14"></div>
+                <div class="aa-form-group"><label class="aa-label">Discount % on Tuition</label>
+                  <input type="number" id="eb_percent" class="aa-input" min="0" max="50" placeholder="e.g. 3"></div>
+              </div>
+              <button class="aa-btn aa-btn-primary" onclick="saveComplianceSettings()"><i class="fa fa-save"></i> Save All Settings</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- Profile Modal -->
+  <div class="aa-modal-backdrop" id="profileModal">
+    <div class="aa-modal">
+      <div class="aa-modal-header"><h5 class="aa-modal-title">My Profile</h5><button class="aa-modal-close" onclick="closeModal('profileModal')">×</button></div>
+      <div class="aa-modal-body">
+        <div class="text-center mb-4">
+          <div class="position-relative d-inline-block">
+            <div class="aa-user-avatar" style="width:100px;height:100px;font-size:40px;margin:0 auto 10px;border:3px solid #f0f4f8;"></div>
+            <label for="profPhotoInput" class="position-absolute" style="bottom:5px;right:5px;background:#f0a500;color:#fff;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;border:2px solid #fff;">
+              <i class="fa fa-camera"></i>
+            </label>
+            <input type="file" id="profPhotoInput" style="display:none;" accept="image/*" onchange="previewProfilePhoto(this)">
+            <input type="hidden" id="profPhotoBase64">
+          </div>
+          <div class="aa-user-name fs-20 fw-700 mt-2"></div>
+          <div class="aa-user-role text-muted fs-14"></div>
+        </div>
+        <div class="aa-form-group">
+          <label class="aa-label">Full Name</label>
+          <input type="text" id="profName" class="aa-input" placeholder="Your full name">
+        </div>
+        <div class="aa-form-group">
+          <label class="aa-label">Email Address</label>
+          <input type="email" id="profEmail" class="aa-input" placeholder="Your email address">
+        </div>
+        <div class="aa-form-group">
+          <label class="aa-label">Phone Number</label>
+          <input type="text" id="profPhone" class="aa-input" placeholder="e.g. +234...">
+        </div>
+        <hr class="my-4" style="border:0;border-top:1px solid #eee;">
+        <h6 class="mb-3">Change Password</h6>
+        <div class="aa-form-group">
+          <label class="aa-label">Current Password</label>
+          <input type="password" id="oldPwd" class="aa-input" placeholder="Enter your current password">
+        </div>
+        <div class="aa-form-group">
+          <label class="aa-label">New Password</label>
+          <input type="password" id="newPwd" class="aa-input" placeholder="Min. 6 characters">
+        </div>
+        <div class="aa-form-group">
+          <label class="aa-label">Confirm New Password</label>
+          <input type="password" id="confirmPwd" class="aa-input" placeholder="Re-enter new password">
+        </div>
+        <div class="d-flex gap-2">
+          <button class="aa-btn aa-btn-outline w-100" onclick="AA.changePwd()">Update Password</button>
+          <button class="aa-btn aa-btn-primary w-100" onclick="AA.updateProfile()">Save Details</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fee Structure Modal -->
+  <div class="aa-modal-backdrop" id="feeModal">
+    <div class="aa-modal aa-modal-lg">
+      <div class="aa-modal-header"><h5 class="aa-modal-title">Fee Structure</h5><button class="aa-modal-close" onclick="closeModal('feeModal')">×</button></div>
+      <div class="aa-modal-body">
+        <input type="hidden" id="feeId">
+        <div class="aa-grid-2 mb-3">
+          <div class="aa-form-group">
+            <label class="aa-label">Class Name <small>(Hold Ctrl/Cmd to select multiple)</small></label>
+            <select id="feeClassName" class="aa-select" required></select>
+          </div>
+          <div class="aa-form-group">
+            <label class="aa-label">Section</label>
+            <select id="feeSectionSelect" class="aa-select">
+              <option value="primary">Primary School</option>
+            </select>
+          </div>
+        </div>
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <label class="aa-label mb-0">Fee Components</label>
+          <button type="button" class="aa-btn aa-btn-outline aa-btn-xs" onclick="addFeeItem()"><i class="fa fa-plus"></i> Add Item</button>
+        </div>
+        <div id="feeItemsList">
+          <!-- fee items injected here -->
+        </div>
+        <div class="d-flex justify-content-end mt-3" style="border-top:1px solid #eee;padding-top:12px;">
+          <span style="font-size:14px;color:#666;">Total: <strong id="feeTotalDisplay">&#8358;0.00</strong></span>
+        </div>
+      </div>
+      <div class="aa-modal-footer">
+        <button class="aa-btn aa-btn-outline" onclick="closeModal('feeModal')">Cancel</button>
+        <button class="aa-btn aa-btn-primary" onclick="saveFeeStructure()">Save Structure</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Payment Modal -->
+  <div class="aa-modal-backdrop" id="paymentModal">
+    <div class="aa-modal">
+      <div class="aa-modal-header"><h5 class="aa-modal-title">Record Payment</h5><button class="aa-modal-close" onclick="closeModal('paymentModal')">×</button></div>
+      <div class="aa-modal-body">
+        <form id="paymentForm">
+          <div class="aa-form-group">
+            <label class="aa-label">Student (Select or Search)</label>
+            <select name="studentId" id="payStudentSelect" class="aa-select" required></select>
+          </div>
+          <div class="aa-grid-2">
+            <div class="aa-form-group"><label class="aa-label">Amount Paid</label><input type="number" name="amount" class="aa-input" required></div>
+            <div class="aa-form-group"><label class="aa-label">Payment Method</label>
+              <select name="method" class="aa-select">
+                <option value="Cash">Cash</option><option value="Bank Transfer">Bank Transfer</option>
+                <option value="POS">POS</option><option value="Cheque">Cheque</option>
+              </select>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="aa-modal-footer">
+        <button class="aa-btn aa-btn-outline" onclick="closeModal('paymentModal')">Cancel</button>
+        <button class="aa-btn aa-btn-success" onclick="savePayment()">Record Payment</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Discount Modal -->
+  <div class="aa-modal-backdrop" id="discountModal">
+    <div class="aa-modal">
+      <div class="aa-modal-header"><h5 class="aa-modal-title">Set Student Discount</h5><button class="aa-modal-close" onclick="closeModal('discountModal')">×</button></div>
+      <div class="aa-modal-body">
+        <input type="hidden" id="discountStudentId">
+        <p style="font-size:13px; color:var(--aa-muted); margin-bottom:15px;">Configure a fee discount for <strong id="discountStudentName" class="text-navy"></strong>. This discount will be applied automatically whenever term bills are generated for their class.</p>
+        <div class="aa-form-group">
+          <label class="aa-label">Discount Type</label>
+          <select id="discountType" class="aa-select" onchange="toggleDiscountValueField()">
+            <option value="none">None (No Discount)</option>
+            <option value="fixed">Fixed Amount (&#8358;)</option>
+            <option value="percentage">Percentage (of Tuition)</option>
+          </select>
+        </div>
+        <div class="aa-form-group" id="discountValueWrap" style="display:none;">
+          <label class="aa-label" id="discountValueLabel">Discount Value</label>
+          <input type="number" id="discountValue" class="aa-input" min="0" placeholder="e.g. 5000 or 10">
+        </div>
+      </div>
+      <div class="aa-modal-footer">
+        <button class="aa-btn aa-btn-outline" onclick="closeModal('discountModal')">Cancel</button>
+        <button class="aa-btn aa-btn-primary" onclick="saveStudentDiscount()">Save Discount</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Expense Modal -->
+  <div class="aa-modal-backdrop" id="expenseModal">
+    <div class="aa-modal">
+      <div class="aa-modal-header"><h5 class="aa-modal-title">Record Expense</h5><button class="aa-modal-close" onclick="closeModal('expenseModal')">×</button></div>
+      <div class="aa-modal-body">
+        <form id="expenseForm">
+          <input type="hidden" name="id" id="expenseId">
+          <div class="aa-grid-2">
+            <div class="aa-form-group"><label class="aa-label">Category</label>
+              <select name="category" class="aa-select" required>
+                <option value="Utilities">Utilities</option><option value="Maintenance">Maintenance</option>
+                <option value="Supplies">Supplies</option><option value="Salaries">Salaries</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div class="aa-form-group"><label class="aa-label">Amount</label><input type="number" name="amount" class="aa-input" required></div>
+          </div>
+          <div class="aa-form-group"><label class="aa-label">Description</label><input type="text" name="description" class="aa-input" required></div>
+          <div class="aa-form-group"><label class="aa-label">Date</label><input type="date" name="date" class="aa-input" id="expDate" required></div>
+        </form>
+      </div>
+      <div class="aa-modal-footer">
+        <button class="aa-btn aa-btn-outline" onclick="closeModal('expenseModal')">Cancel</button>
+        <button class="aa-btn aa-btn-primary" onclick="saveExpense()">Save Expense</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ledger Modal -->
+  <div class="aa-modal-backdrop" id="ledgerModal">
+    <div class="aa-modal aa-modal-lg">
+      <div class="aa-modal-header"><h5 class="aa-modal-title">Student Ledger</h5><button class="aa-modal-close" onclick="closeModal('ledgerModal')">×</button></div>
+      <div class="aa-modal-body">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; background:#f8f9fa; padding:10px; border-radius:6px; border:1px solid #ddd;">
+          <div style="display:flex; gap:10px; align-items:center;">
+            <label style="font-size:12px; font-weight:bold;">From:</label>
+            <input type="date" id="ledgerStartDate" class="aa-input" style="height:32px; width:130px;">
+            <label style="font-size:12px; font-weight:bold;">To:</label>
+            <input type="date" id="ledgerEndDate" class="aa-input" style="height:32px; width:130px;">
+          </div>
+          <div>
+            <button class="aa-btn aa-btn-primary aa-btn-sm" onclick="downloadLedgerPDF()"><i class="fa fa-download"></i> Download PDF</button>
+          </div>
+        </div>
+        <input type="hidden" id="ledgerStudentId">
+        <div id="ledgerContent">Loading...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Review Payment Modal -->
+  <div class="aa-modal-backdrop" id="reviewPaymentModal">
+    <div class="aa-modal">
+      <div class="aa-modal-header">
+        <h5 class="aa-modal-title">Review Parent Payment</h5>
+        <button class="aa-modal-close" onclick="closeModal('reviewPaymentModal')">×</button>
+      </div>
+      <div class="aa-modal-body">
+        <input type="hidden" id="revPayId">
+        <div class="aa-form-group">
+          <label class="aa-label">Student</label>
+          <input type="text" id="revPayStudent" class="aa-input" readonly>
+        </div>
+        <div class="aa-grid-2">
+          <div class="aa-form-group">
+            <label class="aa-label">Amount Paid</label>
+            <input type="text" id="revPayAmount" class="aa-input" readonly>
+          </div>
+          <div class="aa-form-group">
+            <label class="aa-label">Method</label>
+            <input type="text" id="revPayMethod" class="aa-input" readonly>
+          </div>
+        </div>
+        <div class="aa-form-group">
+          <label class="aa-label">Parent's Comment / Note</label>
+          <textarea id="revPayComment" class="aa-input" readonly rows="2" placeholder="No comment provided"></textarea>
+        </div>
+        <div class="aa-form-group">
+          <label class="aa-label">Proof of Payment</label>
+          <div id="revPayProofContainer" style="border:1px solid #ccc; border-radius:6px; overflow:hidden; text-align:center; padding:10px; background:#f9f9f9;">
+            <a id="revPayProofLink" href="#" target="_blank">
+              <img id="revPayProofImg" src="" style="max-width:100%; max-height:300px; display:none;">
+            </a>
+            <div id="revPayProofMissing" style="display:none; color:#999; padding:20px;">No proof uploaded</div>
+          </div>
+        </div>
+        <div class="d-flex gap-2 mt-3">
+          <button class="aa-btn aa-btn-danger w-100" onclick="rejectPayment()"><i class="fa fa-times"></i> Reject</button>
+          <button class="aa-btn aa-btn-success w-100" onclick="approvePayment()"><i class="fa fa-check"></i> Approve</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="api.js?v=3"></script>
+  <script src="scripts.js?v=1788044468"></script>
+  <script>
+    var currentTerm = ''; var currentSession = '';
+    var globalStudents = [];
+    var globalStoreItems = [];
+
+    document.addEventListener('DOMContentLoaded', function() {
+      initTabs('acc-tabs'); AA.init();
+      function initDashboard() {
+        if (!AA.user || !AA.settings || !AA.settings.current_term) return setTimeout(initDashboard, 100);
+        currentTerm = AA.settings.current_term; currentSession = AA.settings.current_session;
+        document.getElementById('currentTermText').textContent = currentTerm + ' - ' + currentSession;
+        document.getElementById('expDate').valueAsDate = new Date();
+        loadStudentsDropdown();
+        loadClassesDropdown();
+        loadDashboard();
+      }
+      initDashboard();
+    });
+
+    function changePwd() {
+      var o = document.getElementById('oldPwd').value.trim();
+      var n = document.getElementById('newPwd').value.trim();
+      var c = document.getElementById('confirmPwd') ? document.getElementById('confirmPwd').value.trim() : n;
+      if (!o || !n) return showToast('Current and new password required.', 'error');
+      if (n.length < 6) return showToast('New password must be at least 6 characters.', 'error');
+      if (n !== c) return showToast('New passwords do not match.', 'error');
+      callServer('userChangePassword', [AA.token, o, n], function(r) {
+        showToast(r.message, r.success ? 'success' : 'error');
+        if (r.success) {
+          document.getElementById('oldPwd').value = '';
+          document.getElementById('newPwd').value = '';
+          if (document.getElementById('confirmPwd')) document.getElementById('confirmPwd').value = '';
+          closeModal('profileModal');
+          setTimeout(function() {
+            if (typeof AA !== 'undefined' && AA.logout) AA.logout();
+          }, 1500);
+        }
+      });
+    }
+
+    function loadStudentsDropdown() {
+      callServer('adminGetStudents', [AA.token], function(data) {
+        globalStudents = data;
+        var sel = document.getElementById('payStudentSelect'); sel.innerHTML='';
+        data.forEach(function(s){ sel.innerHTML += '<option value="'+(s.id||s.iD)+'">'+s.fullName+' ('+s.admissionNumber+')</option>'; });
+      });
+    }
+
+    function loadClassesDropdown() {
+      callServer('adminGetClasses', [AA.token], function(data) {
+        var sel = document.getElementById('feeClassName'); 
+        if(sel) {
+          sel.innerHTML = '<option value="">-- Select Class --</option>';
+          var section = getAccountOfficerSection();
+          if (section !== 'both') {
+            data = data.filter(function(c) {
+               var sec = String(c.section || 'high').toLowerCase().trim();
+               if (sec === 'secondary' || sec === 'highschool' || sec === 'high school') sec = 'high';
+               if (sec === 'primaryschool' || sec === 'primary school') sec = 'primary';
+               return sec === section;
+            });
+          }
+          data.forEach(function(c){ sel.innerHTML += '<option value="'+c.className+'">'+c.className+'</option>'; });
+        }
+      });
+    }
+
+    function openPaymentModal(studentId) {
+      document.getElementById('paymentForm').reset && document.getElementById('paymentForm').reset();
+      if(studentId && document.getElementById('payStudentSelect')) {
+        document.getElementById('payStudentSelect').value = studentId;
+      }
+      openModal('paymentModal');
+    }
+
+    function toggleDiscountValueField() {
+      var type = document.getElementById('discountType').value;
+      var wrap = document.getElementById('discountValueWrap');
+      var label = document.getElementById('discountValueLabel');
+      if (type === 'none') {
+        wrap.style.display = 'none';
+      } else {
+        wrap.style.display = 'block';
+        label.textContent = type === 'percentage' ? 'Percentage (%)' : 'Amount (&#8358;)';
+      }
+    }
+
+    function openDiscountModal(studentId) {
+      var student = globalStudents.find(function(s){ return s.id === studentId || s.iD === studentId; });
+      if (!student) return showToast('Student not found. Wait for load.', 'error');
+      
+      document.getElementById('discountStudentId').value = studentId;
+      document.getElementById('discountStudentName').textContent = student.fullName;
+      
+      var config = student.discountConfig || { type: 'none', value: '' };
+      document.getElementById('discountType').value = config.type || 'none';
+      document.getElementById('discountValue').value = config.value || '';
+      toggleDiscountValueField();
+      
+      openModal('discountModal');
+    }
+
+    function saveStudentDiscount() {
+      var studentId = document.getElementById('discountStudentId').value;
+      var type = document.getElementById('discountType').value;
+      var value = document.getElementById('discountValue').value;
+      
+      if (type !== 'none' && !value) return showToast('Please enter a discount value', 'error');
+      
+      var config = { type: type, value: value };
+      callServer('adminSetStudentDiscount', [AA.token, studentId, config], function(res) {
+        showToast(res.message, res.success ? 'success' : 'error');
+        if (res.success) {
+          closeModal('discountModal');
+          loadStudentsDropdown(); // Refresh student data
+        }
+      }, null, true);
+    }
+
+    // -- Dashboard --
+    
+      function getAccountOfficerSection() {
+        var s = (AA.user && AA.user.section && AA.user.section !== 'both') ? AA.user.section : 'both';
+        if (s === 'secondary') s = 'high';
+        // Fallback to institutionType if section is not explicitly defined and we are in a single section school
+        if (s === 'both' && AA.user && AA.user.institutionType && AA.user.institutionType !== 'both') {
+            s = AA.user.institutionType;
+        }
+        if (s === 'secondary') s = 'high';
+        return s;
+      }
+
+      function loadDashboard() {
+      var section = getAccountOfficerSection();
+      
+      callServer('adminGetFinancialStats', [AA.token, currentTerm, currentSession, section], function(res) {
+        document.getElementById('stat-billed').textContent = formatNaira(res.totalBilled);
+        document.getElementById('stat-collected').textContent = formatNaira(res.totalCollected);
+        document.getElementById('stat-outstanding').textContent = formatNaira(res.totalOutstanding);
+        document.getElementById('stat-expenses').textContent = formatNaira(res.totalExpenses);
+        document.getElementById('stat-net').textContent = formatNaira(res.netBalance);
+        document.getElementById('stat-net').style.color = res.netBalance >= 0 ? 'var(--aa-success)' : 'var(--aa-danger)';
+      }, null, true);
+
+      callServer('adminGetDebtors', [AA.token, currentTerm, currentSession, section], function(data) {
+        var top = data.slice(0, 10); // top 10 debtors
+        buildTable('debtorsTable', [
+          {key:'studentName'},{key:'class', render:function(r){return r.class||r.className||'';} },
+          {key:'amountOwed', render:function(r){return '<strong class="text-danger">'+formatNaira(r.amountOwed)+'</strong>';}}
+        ], top);
+      });
+    }
+
+    // Convert a Google Drive share/view URL to a direct embeddable image URL
+    function driveViewToEmbed(url) {
+      if (!url) return url;
+      // Handle https://drive.google.com/file/d/FILE_ID/view?usp=sharing
+      var m = url.match(/\/file\/d\/([^\/]+)/);
+      if (m) return 'https://drive.google.com/uc?export=view&id=' + m[1];
+      return url; // Return as-is if already a direct URL or base64
+    }
+
+    function openReviewPaymentModal(payId) {
+      callServer('adminGetPayments', [AA.token, {status:'Pending'}], function(payments) {
+        var p = payments.find(function(x) { return String(x.id||x.iD) === String(payId); });
+        if(!p) {
+          // Not found in pending, try all
+          callServer('adminGetPayments', [AA.token, {}], function(allPayments) {
+            var pp = allPayments.find(function(x) { return String(x.id||x.iD) === String(payId); });
+            if(pp) _openReviewModal(pp);
+          });
+          return;
+        }
+        _openReviewModal(p);
+      }, null, true);
+    }
+
+    function _openReviewModal(p) {
+      document.getElementById('revPayId').value = p.id || p.iD;
+      document.getElementById('revPayStudent').value = p.studentName || (globalStudents.find(function(st){ return String(st.id||st.iD) === String(p.studentID||p.studentId); }) || {}).fullName || (p.studentID||p.studentId||'Unknown');
+      document.getElementById('revPayAmount').value = formatNaira(p.amount);
+      document.getElementById('revPayMethod').value = p.method || '';
+      document.getElementById('revPayComment').value = p.comment || '';
+      
+      var proofLink = document.getElementById('revPayProofLink');
+      var proofImg = document.getElementById('revPayProofImg');
+      var proofMissing = document.getElementById('revPayProofMissing');
+      
+      if (p.proofOfPayment) {
+        var embedUrl = driveViewToEmbed(p.proofOfPayment);
+        proofImg.src = embedUrl;
+        proofLink.href = p.proofOfPayment; // keep original for open-in-new-tab
+        proofImg.style.display = 'inline-block';
+        proofMissing.style.display = 'none';
+      } else {
+        proofImg.src = '';
+        proofLink.href = '#';
+        proofImg.style.display = 'none';
+        proofMissing.style.display = 'block';
+      }
+      openModal('reviewPaymentModal');
+    }
+
+    function approvePayment() {
+      var pid = document.getElementById('revPayId').value;
+      if(confirm('Are you sure you want to approve this payment? The balance will be updated.')) {
+        callServer('adminApprovePayment', [AA.token, pid], function(res) {
+          if(res.success) { showToast(res.message, 'success'); closeModal('reviewPaymentModal'); loadBills(); loadDashboard(); }
+          else showToast(res.message, 'error');
+        });
+      }
+    }
+
+    function rejectPayment() {
+      var pid = document.getElementById('revPayId').value;
+      if(confirm('Are you sure you want to REJECT this payment? The parent will be notified.')) {
+        callServer('adminRejectPayment', [AA.token, pid], function(res) {
+          if(res.success) { showToast(res.message, 'success'); closeModal('reviewPaymentModal'); loadBills(); }
+          else showToast(res.message, 'error');
+        });
+      }
+    }
+
+    // -- Fee Structure --
+    function addFeeItem(name, amount) {
+      var list = document.getElementById('feeItemsList');
+      var idx = list.children.length;
+      var row = document.createElement('div');
+      row.className = 'd-flex gap-2 mb-2 align-items-center fee-item-row';
+      row.innerHTML = '<input type="text" class="aa-input fee-item-name" placeholder="Fee name (e.g. Tuition Fee)" value="'+(name||'')+'" style="flex:2;" oninput="recalcFeeTotal()">'+
+        '<input type="number" class="aa-input fee-item-amount" placeholder="Amount" value="'+(amount||'')+'" min="0" style="flex:1;" oninput="recalcFeeTotal()">'+
+        '<button type="button" class="aa-btn aa-btn-danger aa-btn-xs" onclick="this.closest(\'div\').remove();recalcFeeTotal();"><i class="fa fa-trash"></i></button>';
+      list.appendChild(row);
+    }
+
+    function recalcFeeTotal() {
+      var total = 0;
+      document.querySelectorAll('#feeItemsList .fee-item-amount').forEach(function(inp){
+        total += parseFloat(inp.value || 0);
+      });
+      document.getElementById('feeTotalDisplay').textContent = formatNaira(total);
+    }
+
+    function openNewFeeModal() {
+      document.getElementById('feeId').value = '';
+      var feeClassSelect = document.getElementById('feeClassName');
+      feeClassSelect.multiple = true;
+      feeClassSelect.style.height = '120px';
+      Array.from(feeClassSelect.options).forEach(function(o){o.selected=false;});
+      
+      var sec = getAccountOfficerSection();
+      var feeSecSel = document.getElementById('feeSectionSelect');
+      feeSecSel.value = sec !== 'both' ? sec : 'high';
+      feeSecSel.disabled = (sec !== 'both');
+      
+      document.getElementById('feeItemsList').innerHTML = '';
+      // Seed with 2 default rows
+      addFeeItem('Tuition Fee', '');
+      addFeeItem('Development Levy', '');
+      recalcFeeTotal();
+      openModal('feeModal');
+    }
+
+    function loadFeeStructures() {
+      callServer('adminGetFeeStructures', [AA.token], function(data) {
+        var filtered = data.filter(function(d){ return d.term===currentTerm && d.session===currentSession; });
+        var section = getAccountOfficerSection();
+        if (section !== 'both') {
+          filtered = filtered.filter(function(d){ 
+            var s = String(d.section || 'high').toLowerCase().trim();
+            if (s === 'secondary' || s === 'highschool' || s === 'high school') s = 'high';
+            if (s === 'primaryschool' || s === 'primary school') s = 'primary';
+            return s === section; 
+          });
+        }
+        filtered.sort(function(a, b) {
+          return (a.className || '').localeCompare(b.className || '', undefined, {numeric: true, sensitivity: 'base'});
+        });
+        buildTable('feesTable', [
+          {key:'className'},
+          {key:'section', render:function(r){ return r.section ? r.section.charAt(0).toUpperCase()+r.section.slice(1) : '-'; }},
+          {key:'lineItems', render:function(r){
+            var items = [];
+            try { items = typeof r.lineItems === 'string' ? JSON.parse(r.lineItems) : (r.lineItems || []); } catch(e){}
+            if(items.length === 0) {
+              // Fallback for legacy rows
+              if(r.tuitionFee) items.push({name:'Tuition', amount: r.tuitionFee});
+              if(r.developmentLevy) items.push({name:'Dev Levy', amount: r.developmentLevy});
+              if(r.examFee) items.push({name:'Exam', amount: r.examFee});
+              if(r.sportsFee) items.push({name:'Sports', amount: r.sportsFee});
+            }
+            return items.map(function(i){ return '<span class="aa-badge" style="margin:1px;font-size:11px;">'+i.name+': '+formatNaira(i.amount)+'</span>'; }).join('');
+          }},
+          {key:'totalFee',render:function(r){return '<strong>'+formatNaira(r.totalFee)+'</strong>';}}
+        ], filtered, function(r) {
+          var id = r.id||r.iD;
+          return '<button class="aa-btn aa-btn-outline aa-btn-xs" onclick="editFee(\''+id+'\')"><i class="fa fa-edit"></i></button> '+
+                 '<button class="aa-btn aa-btn-danger aa-btn-xs" onclick="deleteFee(\''+id+'\')"><i class="fa fa-trash"></i></button>';
+        });
+      }, null, true);
+    }
+
+    function editFee(id) {
+      callServer('adminGetFeeStructures', [AA.token], function(data) {
+        var f = data.find(function(x){return String(x.id||x.iD)===String(id);});
+        if (!f) return;
+        document.getElementById('feeId').value = id;
+        var feeClassSelect = document.getElementById('feeClassName');
+        feeClassSelect.multiple = false;
+        feeClassSelect.style.height = 'auto';
+        feeClassSelect.value = f.className || '';
+        var sec = getAccountOfficerSection();
+        var feeSecSel = document.getElementById('feeSectionSelect');
+        feeSecSel.value = f.section || 'high';
+        feeSecSel.disabled = (sec !== 'both');
+        document.getElementById('feeItemsList').innerHTML = '';
+        var items = [];
+        try { items = typeof f.lineItems === 'string' ? JSON.parse(f.lineItems) : (f.lineItems || []); } catch(e){}
+        if (items.length === 0) {
+          if (f.tuitionFee) items.push({name:'Tuition Fee', amount: f.tuitionFee});
+          if (f.developmentLevy) items.push({name:'Development Levy', amount: f.developmentLevy});
+          if (f.examFee) items.push({name:'Exam Fee', amount: f.examFee});
+          if (f.sportsFee) items.push({name:'Sports Fee', amount: f.sportsFee});
+        }
+        if (items.length === 0) addFeeItem('Tuition Fee', '');
+        items.forEach(function(item){ addFeeItem(item.name, item.amount); });
+        recalcFeeTotal();
+        openModal('feeModal');
+      }, null, true);
+    }
+
+    function deleteFee(id) {
+      aaConfirm('Delete this fee structure?', function() {
+        callServer('adminDeleteFeeStructure', [AA.token, id], function(res){
+          showToast(res.message, res.success?'success':'error');
+          if(res.success) loadFeeStructures();
+        }, null, true);
+      });
+    }
+
+    // -- Store Payments --
+    function loadStorePaymentsTab() {
+      // Ensure students dropdown is loaded in this form
+      var sel = document.getElementById('spStudentSelect');
+      if (sel.options.length <= 1) {
+         sel.innerHTML = '<option value="">-- Select Student --</option>';
+         globalStudents.forEach(function(s){ 
+            sel.innerHTML += '<option value="'+(s.id||s.iD)+'">'+s.fullName+' ('+(s.className||'')+')</option>'; 
+         });
+      }
+      
+      // Load store items
+      var section = getAccountOfficerSection();
+      callServer('adminGetStoreItems', [AA.token, section], function(items) {
+         globalStoreItems = items;
+         var itmSel = document.getElementById('spItemSelect');
+         itmSel.innerHTML = '<option value="">-- Select Item --</option>';
+         items.forEach(function(i){
+            itmSel.innerHTML += '<option value="'+i.id+'" data-price="'+(i.price||0)+'">'+i.name+' ('+formatNaira(i.price||0)+')</option>';
+         });
+      });
+    }
+
+    function updateStorePaymentAmount() {
+      var itemSelect = document.getElementById('spItemSelect');
+      var qty = parseInt(document.getElementById('spQuantity').value || 1);
+      if (itemSelect.selectedIndex > 0) {
+         var price = parseFloat(itemSelect.options[itemSelect.selectedIndex].getAttribute('data-price') || 0);
+         document.getElementById('spAmount').value = price * qty;
+      } else {
+         document.getElementById('spAmount').value = '';
+      }
+    }
+
+    function saveStorePayment() {
+      var sId = document.getElementById('spStudentSelect').value;
+      var iId = document.getElementById('spItemSelect').value;
+      var qty = document.getElementById('spQuantity').value;
+      var amt = document.getElementById('spAmount').value;
+      var method = document.getElementById('spMethod').value;
+      
+      if (!sId || !iId || !qty) return showToast('Please fill all required fields.', 'error');
+      
+      var student = globalStudents.find(function(s){ return String(s.id||s.iD) === String(sId); });
+      var item = globalStoreItems.find(function(i){ return String(i.id) === String(iId); });
+      
+      var data = {
+         studentId: sId,
+         studentName: student ? student.fullName : 'Unknown',
+         itemId: iId,
+         itemName: item ? item.name : 'Unknown Item',
+         quantity: qty,
+         amountPaid: amt,
+         paymentMethod: method,
+         section: item ? (item.section || 'both') : 'both'
+      };
+
+      callServer('adminCreateStoreOrder', [AA.token, data], function(res) {
+         if (res.success) {
+            showToast('Payment recorded! Storekeeper has been notified.', 'success');
+            document.getElementById('storePaymentForm').reset();
+         } else {
+            showToast(res.message, 'error');
+         }
+      }, null, true);
+    }
+
+
+    function saveFeeStructure() {
+      var feeClassSelect = document.getElementById('feeClassName');
+      var classesArr = Array.from(feeClassSelect.selectedOptions).map(function(opt) { return opt.value; });
+      var className = classesArr.join(',').trim();
+      var id = document.getElementById('feeId').value || '';
+      var section = document.getElementById('feeSectionSelect').value;
+      if (!className) return showToast('Class name is required.', 'error');
+      if (id && classesArr.length > 1) return showToast('You can only select one class when editing an existing fee structure.', 'error');
+      var items = [];
+      var rows = document.querySelectorAll('#feeItemsList .fee-item-row');
+      var hasError = false;
+      rows.forEach(function(row) {
+        var name = row.querySelector('.fee-item-name').value.trim();
+        var amount = parseFloat(row.querySelector('.fee-item-amount').value || 0);
+        if (!name) { hasError = true; return; }
+        items.push({name: name, amount: amount});
+      });
+      if (hasError) return showToast('All fee items must have a name.', 'error');
+      if (items.length === 0) return showToast('Add at least one fee item.', 'error');
+      var total = items.reduce(function(s,i){ return s + (parseFloat(i.amount)||0); }, 0);
+      var data = {
+        id: document.getElementById('feeId').value || '',
+        className: className,
+        section: section,
+        term: currentTerm,
+        session: currentSession,
+        lineItems: JSON.stringify(items),
+        totalFee: total
+      };
+      callServer('adminSaveFeeStructure', [AA.token, data], function(res) {
+        showToast(res.message, res.success?'success':'error');
+        if(res.success){ closeModal('feeModal'); loadFeeStructures(); }
+      }, null, true);
+    }
+
+    // -- Bills & Payments --
+    var globalBills = [];
+    function loadBills() {
+      callServer('adminGetBills', [AA.token, {}], function(bills) {
+                  var section = getAccountOfficerSection();
+          if (section !== 'both') {
+            bills = bills.filter(function(b) {
+               var stu = globalStudents.find(function(s){ return (s.id||s.iD) == (b.studentID||b.studentId); });
+               var stuSec = stu ? (stu.section || 'high') : 'high';
+               if (stuSec === 'secondary') stuSec = 'high';
+               return stuSec.toLowerCase() === section;
+            });
+          }
+          globalBills = bills; // Cache for use in savePayment
+        buildTable('billsTable', [
+          {key:'studentName', render:function(r){return '<a href="#" class="fw-600 text-navy" style="text-decoration:none;" onclick="event.preventDefault();viewLedger(\''+(r.studentID||r.studentId)+'\')">' +r.studentName+'</a>';}},
+          {key:'class', render:function(r){return r.class||r.className||'';}},
+          {key:'originalFeeTotal', render:function(r){return formatNaira(r.originalFeeTotal||r.totalBilled);}},
+          {key:'discountAmount', render:function(r){ var d=r.discountAmount||0; return d>0?'<span class="text-success">-'+formatNaira(d)+'</span>':'<span class="text-muted">-</span>'; }},
+          {key:'totalBilled', render:function(r){return '<strong>'+formatNaira(r.totalBilled)+'</strong>';}},
+          {key:'totalPaid', render:function(r){return '<strong class="text-success">'+formatNaira(r.totalPaid)+'</strong>';}},
+          {key:'balance', render:function(r){return '<strong class="text-danger">'+formatNaira(r.balance)+'</strong>';}},
+          {key:'status', render:function(r){return formatStatus(r.status);}}
+        ], bills, function(r){
+          var bid = r.id||r.iD;
+          var sid = r.studentID||r.studentId;
+          return '<button class="aa-btn aa-btn-outline aa-btn-xs me-1" onclick="openPaymentModal(\''+sid+'\')">' + 'Record Payment</button>' +
+                 '<button class="aa-btn aa-btn-warning aa-btn-xs me-1" onclick="openDiscountModal(\''+sid+'\')" title="Set Discount"><i class="fa fa-percent"></i></button>' +
+                 '<button class="aa-btn aa-btn-info aa-btn-xs me-1" onclick="viewLedger(\''+sid+'\')">' + 'Ledger</button>' +
+                 '<button class="aa-btn aa-btn-secondary aa-btn-xs me-1" onclick="downloadBillInvoice(\''+bid+'\')" title="Download Invoice"><i class="fa fa-file-pdf"></i></button>' +
+                 '<button class="aa-btn aa-btn-danger aa-btn-xs" onclick="deleteBill(\''+bid+'\')" title="Delete Bill"><i class="fa fa-trash"></i></button>';
+        });
+      }, null, true);
+
+      // Load pending payments
+      callServer('adminGetPayments', [AA.token, {status: 'Pending'}], function(payments) {
+        var pending = payments.filter(function(p){ return String(p.status||'').toLowerCase() === 'pending'; });
+        var section = getAccountOfficerSection();
+        if (section !== 'both') {
+          pending = pending.filter(function(p) {
+             var stu = globalStudents.find(function(s){ return (s.id||s.iD) == (p.studentID||p.studentId); });
+             var stuSec = stu ? (stu.section || 'high') : 'high';
+             if (stuSec === 'secondary') stuSec = 'high';
+             return stuSec.toLowerCase() === section;
+          });
+        }
+        if(pending.length > 0) {
+          document.getElementById('pendingPaymentsCard').style.display = 'block';
+          buildTable('pendingPaymentsTable', [
+            {key:'date', render:function(r){return formatDate(r.paymentDate||r.date);}},
+            {key:'studentId', render:function(r){
+              var s = globalStudents.find(function(st){ return (st.id||st.iD) == (r.studentID||r.studentId); });
+              return s ? s.fullName : r.studentID;
+            }},
+            {key:'receiptRef'},
+            {key:'amount', render:function(r){return '<strong class="text-success">'+formatNaira(r.amount)+'</strong>';}},
+            {key:'method'}
+          ], pending, function(r){
+            return '<button class="aa-btn aa-btn-primary aa-btn-xs" onclick="openReviewPaymentModal(\''+(r.id||r.iD)+'\')">Review</button>';
+          });
+        } else {
+          document.getElementById('pendingPaymentsCard').style.display = 'none';
+        }
+      }, null, true);
+    }
+    function generateBills() {
+      aaConfirm('Generate term bills for all active students based on current fee structures? This will skip existing bills.', function() {
+        callServer('adminGenerateBills', [AA.token, currentTerm, currentSession], function(res){ showToast(res.message, res.success?'success':'error'); if(res.success){loadBills();loadDashboard();} }, null, true);
+      });
+    }
+    function deleteBill(billId) {
+      aaConfirm('Delete this bill record? This will allow it to be regenerated. This cannot be undone.', function() {
+        callServer('adminDeleteBill', [AA.token, billId], function(res) {
+          showToast(res.message, res.success?'success':'error');
+          if(res.success){ loadBills(); loadDashboard(); }
+        }, null, true);
+      });
+    }
+    function savePayment() {
+      var data = getFormData('paymentForm');
+      data.term = currentTerm;
+      data.session = currentSession;
+
+      // Enrich with student name and class from globalStudents
+      var studentId = data.studentId || data.studentID;
+      var student = (globalStudents || []).find(function(s) { return s.id === studentId || s.iD === studentId; });
+      if (student) {
+        data.studentName = student.fullName;
+        data.className = student.className || student.class || '';
+      }
+
+      // Calculate remaining balance from globalBills if available
+      var bills = typeof globalBills !== 'undefined' ? globalBills : [];
+      var bill = bills.find(function(b) { return (b.studentId || b.studentID) === studentId; });
+      if (bill) {
+        var prevPaid = Number(bill.totalPaid || 0);
+        var newPaid = prevPaid + Number(data.amount || 0);
+        var billed = Number(bill.totalBilled || 0);
+        data.balanceAfterPayment = Math.max(0, billed - newPaid);
+      }
+
+      callServer('adminRecordPayment', [AA.token, data], function(res) {
+        showToast(res.message, res.success ? 'success' : 'error');
+        if (res.success) { closeModal('paymentModal'); loadBills(); loadDashboard(); }
+      }, null, true);
+    }
+    function viewLedger(sid) {
+      document.getElementById('ledgerStudentId').value = sid;
+      callServer('adminGetStudentLedger', [AA.token, sid], function(res) {
+        var html = '';
+        if (res.creditBalance > 0) {
+          html += '<div class="aa-alert aa-alert-success mb-4" style="display:flex; align-items:center; gap:8px;"><i class="fa fa-piggy-bank" style="font-size:16px;"></i> <div>Student has an overage (credit balance) of <strong>' + formatNaira(res.creditBalance) + '</strong>.</div></div>';
+        }
+        html += '<h6>Term Bills</h6><table class="aa-table mb-4"><thead><tr><th>Term/Session</th><th>Billed</th><th>Paid</th><th>Bal</th><th>Status</th></tr></thead><tbody>';
+        res.bills.forEach(function(b){ html += '<tr><td>'+b.term+' '+b.session+'</td><td>'+formatNaira(b.totalBilled)+'</td><td>'+formatNaira(b.totalPaid)+'</td><td>'+formatNaira(b.balance)+'</td><td>'+formatStatus(b.status)+'</td></tr>'; });
+        html += '</tbody></table><h6>Payments History</h6><table class="aa-table"><thead><tr><th>Date</th><th>Term</th><th>Ref</th><th>Amount</th><th>Method</th><th>Receipt</th></tr></thead><tbody>';
+        res.payments.forEach(function(p){ 
+          var pid = p.id||p.iD;
+          html += '<tr><td>'+formatDate(p.paymentDate||p.date)+'</td><td>'+p.term+' '+p.session+'</td><td>'+(p.receiptRef||'')+'</td><td><strong class="text-success">'+formatNaira(p.amount)+'</strong></td><td>'+p.method+'</td>'+
+          '<td><button class="aa-btn aa-btn-outline aa-btn-xs" onclick="downloadReceipt(\''+pid+'\')"><i class="fa fa-download"></i></button></td></tr>'; 
+        });
+        if(res.payments.length===0) html += '<tr><td colspan="6" class="text-center text-muted">No payments found.</td></tr>';
+        html += '</tbody></table>';
+        document.getElementById('ledgerContent').innerHTML = html;
+        openModal('ledgerModal');
+      }, null, true);
+    }
+    function downloadReceipt(payId) {
+      callServer('adminGenerateReceipt', [AA.token, payId], function(res){
+        if(res.success) {
+          // Decode the data URI and open in a new tab using document.write (avoids popup blockers)
+          var newTab = window.open('', '_blank');
+          if (newTab) {
+            var decoded = decodeURIComponent(res.previewUrl.replace('data:text/html;charset=utf-8,', ''));
+            newTab.document.open();
+            newTab.document.write(decoded);
+            newTab.document.close();
+          } else {
+            showToast('Popup blocked. Please allow popups for this site.', 'error');
+          }
+        } else {
+          showToast(res.message, 'error');
+        }
+      }, null, true);
+    }
+
+    function downloadLedgerPDF() {
+      var sid = document.getElementById('ledgerStudentId').value;
+      var startDate = document.getElementById('ledgerStartDate').value;
+      var endDate = document.getElementById('ledgerEndDate').value;
+      if (!sid) return showToast('No student selected', 'error');
+      
+      callServer('adminDownloadLedgerPDF', [AA.token, sid, startDate, endDate], function(res) {
+        if(res.success) {
+          var newTab = window.open('', '_blank');
+          if (newTab) {
+            var decoded = decodeURIComponent(res.previewUrl.replace('data:text/html;charset=utf-8,', ''));
+            newTab.document.open();
+            newTab.document.write(decoded);
+            newTab.document.close();
+            // Optional: trigger print automatically
+            setTimeout(function(){ newTab.print(); }, 1000);
+          } else {
+            showToast('Popup blocked. Please allow popups for this site.', 'error');
+          }
+        } else {
+          showToast(res.message || 'Error generating PDF', 'error');
+        }
+      }, null, true);
+    }
+
+    // -- Expenses --
+    function loadExpenses() {
+      callServer('adminGetExpenses', [AA.token], function(data) {
+        var section = getAccountOfficerSection();
+        if (section !== 'both') {
+          data = data.filter(function(e) {
+             if (!e.section || e.section === 'both') return true; // Show general expenses
+             var s = e.section.toLowerCase();
+             if (s === 'secondary') s = 'high';
+             return s === section;
+          });
+        }
+        buildTable('expensesTable', [
+          {key:'date',render:function(r){return formatDate(r.date);}},
+          {key:'category'},{key:'description'},
+          {key:'amount',render:function(r){return formatNaira(r.amount);}}
+        ], data, function(r) { return '<button class="aa-btn aa-btn-danger aa-btn-xs" onclick="delExp(\''+(r.id||r.iD)+'\')"><i class="fa fa-trash"></i></button>'; });
+      }, null, true);
+    }
+    function saveExpense() {
+      var data = getFormData('expenseForm');
+      callServer('adminRecordExpense', [AA.token, data], function(res) {
+        showToast(res.message, res.success?'success':'error'); if(res.success){closeModal('expenseModal');loadExpenses();loadDashboard();}
+      }, null, true);
+    }
+    function delExp(id) {
+      aaConfirm('Delete this expense record?', function() {
+        callServer('adminDeleteExpense', [AA.token, id], function(res){ showToast(res.message, res.success?'success':'error'); if(res.success){loadExpenses();loadDashboard();} }, null, true);
+      });
+    }
+
+    // -- Reminders --
+    function sendReminders() {
+      aaConfirm('Send email reminders to parents with outstanding balances? This will process in batches.', function() {
+        processRemindersBatch(50);
+      });
+    }
+
+    function processRemindersBatch(batchSize) {
+        showToast('Processing reminder batch...', 'info');
+        callServer('adminSendReminders', [AA.token, currentTerm, currentSession, batchSize], function(res) {
+            if (res.success) {
+                showToast(res.message, 'success');
+                if (res.remaining > 0) {
+                    setTimeout(function() {
+                        processRemindersBatch(batchSize);
+                    }, 2000);
+                } else {
+                    showToast('All outstanding reminders have been sent.', 'success');
+                }
+            } else {
+                showToast(res.message, 'error');
+            }
+        }, null, true);
+    }
+  </script>
+
+  <script>
+    // ====================================
+    // INSTALLMENT PLANS JS
+    // ====================================
+    function loadInstallmentPlans() {
+      var status = (document.getElementById('planFilterStatus') || {}).value || '';
+      callServer('adminGetInstallmentPlans', [AA.token, status || null], function(res) {
+        // api.js unwraps {success:true, data:[...]} → returns the array directly
+        var plans = Array.isArray(res) ? res : (res && res.data ? res.data : null);
+        if (plans === null) {
+          return showToast((res && res.message) || 'Failed to load plans.', 'error');
+        }
+
+        // Client-side section filter — belt-and-suspenders, mirrors loadBills
+        var section = getAccountOfficerSection(); // "primary", "high", or "both"
+        if (section !== 'both') {
+          plans = plans.filter(function(p) {
+            var planSec = (p.section || 'both').toLowerCase();
+            if (planSec === 'secondary' || planSec === 'high_school') planSec = 'high';
+            return planSec === section || planSec === 'both';
+          });
+        }
+
+        var tbody = document.querySelector('#plansTable tbody');
+        if (!tbody) return;
+        if (plans.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#94a3b8;padding:20px;">No installment plans found.</td></tr>';
+          return;
+        }
+        tbody.innerHTML = plans.map(function(p) {
+          var statusBadge = p.status === 'pending' ? '<span class="aa-badge aa-badge-warning">Pending</span>'
+            : p.status === 'approved' ? '<span class="aa-badge aa-badge-success">Approved</span>'
+            : '<span class="aa-badge aa-badge-danger">Rejected</span>';
+          var milestonesSummary = (p.milestones || []).map(function(m, i) {
+            return '<small>' + (i+1) + '. ' + (m.dueDate||'') + ' — \u20a6' + Number(m.amount||0).toLocaleString() + (m.paid ? ' <i class="fa fa-check" style="color:#10b981;"></i>' : '') + '</small>';
+          }).join('<br>');
+          var actions = p.status === 'pending'
+            ? '<button class="aa-btn aa-btn-success aa-btn-xs" onclick="approvePlan(\'' + p.id + '\')" style="margin-right:4px;"><i class="fa fa-check"></i> Approve</button><button class="aa-btn aa-btn-xs" style="background:#ef4444;color:#fff;" onclick="rejectPlan(\'' + p.id + '\')"><i class="fa fa-times"></i> Reject</button>'
+            : '<span style="color:#64748b;font-size:12px;">—</span>';
+          return '<tr><td>' + (p.studentName||'') + '</td><td>' + (p.term||'') + ' ' + (p.session||'') + '</td><td>\u20a6' + Number(p.totalAmount||0).toLocaleString() + '</td><td>' + milestonesSummary + '</td><td>' + statusBadge + '</td><td>' + actions + '</td></tr>';
+        }).join('');
+      }, null, true);
+    }
+
+    function approvePlan(planId) {
+      if (!confirm('Approve this installment plan?')) return;
+      callServer('adminApproveInstallmentPlan', [AA.token, planId], function(res) {
+        showToast((res && res.message) || 'Done.', res && res.success ? 'success' : 'error');
+        if (res && res.success) loadInstallmentPlans();
+      }, null, true);
+    }
+
+    function rejectPlan(planId) {
+      var reason = prompt('Reason for rejection (optional):');
+      callServer('adminRejectInstallmentPlan', [AA.token, planId, reason || ''], function(res) {
+        showToast((res && res.message) || 'Done.', res && res.success ? 'success' : 'error');
+        if (res && res.success) loadInstallmentPlans();
+      }, null, true);
+    }
+
+    // ====================================
+    // COMPLIANCE RULES JS
+    // ====================================
+    function loadComplianceSettings() {
+      callServer('adminGetComplianceRules', [AA.token], function(res) {
+        if (!res.success) return;
+        var d = res.data || {};
+        var cbtSel = document.getElementById('cbt_lock_enabled');
+        if (cbtSel) cbtSel.value = d.cbt_lock_enabled ? 'true' : 'false';
+        var cbtThresh = document.getElementById('cbt_lock_threshold');
+        if (cbtThresh) cbtThresh.value = (d.cbt_lock_threshold !== undefined ? d.cbt_lock_threshold * 100 : 50);
+        var rptSel = document.getElementById('report_lock_enabled');
+        if (rptSel) rptSel.value = d.report_lock_enabled ? 'true' : 'false';
+        var rptMin = document.getElementById('report_lock_min_balance');
+        if (rptMin) rptMin.value = d.report_lock_min_balance || 0;
+      }, null, false);
+
+      callServer('adminGetEarlyBirdConfig', [AA.token], function(res) {
+        if (!res.success) return;
+        var d = res.data || {};
+        var ebSel = document.getElementById('eb_enabled');
+        if (ebSel) ebSel.value = d.enabled ? 'true' : 'false';
+        var ebDays = document.getElementById('eb_days');
+        if (ebDays) ebDays.value = d.days || 14;
+        var ebPct = document.getElementById('eb_percent');
+        if (ebPct) ebPct.value = d.discountPercent || 3;
+      }, null, false);
+    }
+
+    function saveComplianceSettings() {
+      var rules = {
+        cbt_lock_enabled: document.getElementById('cbt_lock_enabled').value === 'true',
+        cbt_lock_threshold: (parseFloat(document.getElementById('cbt_lock_threshold').value) || 50) / 100,
+        report_lock_enabled: document.getElementById('report_lock_enabled').value === 'true',
+        report_lock_min_balance: parseFloat(document.getElementById('report_lock_min_balance').value) || 0
+      };
+      var ebConfig = {
+        enabled: document.getElementById('eb_enabled').value === 'true',
+        days: parseInt(document.getElementById('eb_days').value) || 14,
+        discountPercent: parseFloat(document.getElementById('eb_percent').value) || 3
+      };
+      callServer('adminSetComplianceRules', [AA.token, rules], function(r1) {
+        callServer('adminSetEarlyBirdConfig', [AA.token, ebConfig], function(r2) {
+          showToast(r1.success && r2.success ? 'Settings saved successfully!' : 'Some settings could not be saved.', r1.success && r2.success ? 'success' : 'error');
+        }, null, true);
+      }, null, true);
+    }
+  </script>
+</body>
+</html>
+
