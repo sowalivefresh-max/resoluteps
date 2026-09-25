@@ -1351,7 +1351,7 @@
       initTabs('admin-tabs');
       AA.init();
       function initDashboard() {
-        if (!AA.user || !AA.settings || !AA.settings.current_term) return setTimeout(initDashboard, 100);
+        if (!AA.user || !AA.settings) return setTimeout(initDashboard, 100);
         
         if (AA.user.role === 'developer') {
           document.getElementById('dev-controls').style.display = 'block';
