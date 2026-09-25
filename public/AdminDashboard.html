@@ -1721,7 +1721,7 @@
       
       // For single-section schools, force the correct section
       if (!formData.section || formData.section === '') {
-        else if (institutionType === 'secondary') formData.section = 'high';
+        if (institutionType === 'secondary') formData.section = 'high';
         else if (institutionType === 'primary') formData.section = 'primary';
       }
       
