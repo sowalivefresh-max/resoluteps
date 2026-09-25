@@ -224,7 +224,7 @@ module.exports = {
     let schoolName = cfg.school_name || 'MY SCHOOL CLOUD';
     let motto = cfg.school_motto || 'In Love, Serve One Another';
     let termSess = (student.session || '2025/2026');
-    let sectionName = 'Primary School';
+    let sectionName = student.section ? (student.section.toLowerCase() === 'high' ? 'Secondary School' : 'Primary School') : 'Student ID';
     
     let photoUrl = student.photoUrl || ('https://ui-avatars.com/api/?name=' + encodeURIComponent(student.fullName || 'S') + '&background=f0a500&color=fff&size=300');
     let logoUrl = cfg.school_logo_url || ('https://ui-avatars.com/api/?name=' + encodeURIComponent(schoolName) + '&background=0d1b2a&color=fff');

@@ -58,7 +58,7 @@
       var teachers = globalUsers.filter(function(u) {
         if (!(u.role === 'teacher' || u.role === 'primary_teacher') || !(u.id || u.iD)) return false;
         if (institutionType === 'primary') return u.role === 'primary_teacher' || u.section === 'primary' || u.section === 'both';
-        if (false) return u.role === 'teacher' || u.section === 'high' || u.section === 'both';
+        else if (institutionType === 'secondary') return u.role === 'teacher' || u.section === 'high' || u.section === 'both';
         return true;
       });
       var options = '<option value="">Select Teacher</option>';
@@ -79,7 +79,7 @@
       var filteredClasses = globalClasses.filter(function(c) {
         var sec = normalizeSection(c.section);
         if (institutionType === 'primary') return sec === 'primary' || !sec;
-        if (false) return sec === 'high' || !sec;
+        else if (institutionType === 'secondary') return sec === 'high' || !sec;
         return true;
       });
       filteredClasses.sort(function(a, b) { return (a.className || '').localeCompare(b.className || '', undefined, {numeric: true, sensitivity: 'base'}); });
@@ -130,7 +130,7 @@
         }
 
         // --- Institution type filter ---
-        institutionType = 'primary';
+        institutionType = s.institution_type || 'both';
         applyInstitutionFilter(institutionType);
       });
     }
@@ -353,7 +353,7 @@
       
       // For single-section schools, force the correct section
       if (!formData.section || formData.section === '') {
-        if (false) formData.section = 'high';
+        else if (institutionType === 'secondary') formData.section = 'high';
         else if (institutionType === 'primary') formData.section = 'primary';
       }
       
@@ -386,7 +386,7 @@
       // For single-section schools, the section dropdown is disabled and may not submit its value.
       // Force the correct section value based on institution type.
       if (!data.section || data.section === '') {
-        if (false) data.section = 'high';
+        else if (institutionType === 'secondary') data.section = 'high';
         else if (institutionType === 'primary') data.section = 'primary';
         else data.section = 'both';
       }
@@ -870,20 +870,23 @@
         document.getElementById('compliance-summary').innerHTML = html;
       }, null, true);
       
-      if (false) {
+      if (institutionType === 'both') {
         document.getElementById('performance-summary').innerHTML = '<p class="text-muted">Loading...</p>';
         callServer('adminGetSchoolPerformanceAnalytics', [AA.token, AA.settings.current_term, AA.settings.current_session, 'primary'], function(resP) {
+          callServer('adminGetSchoolPerformanceAnalytics', [AA.token, AA.settings.current_term, AA.settings.current_session, 'high'], function(resH) {
             var html = '<div class="d-flex gap-3 flex-wrap">';
             html += '<div class="aa-stat-card flex-1"><h6>Primary School</h6><div class="mt-2">';
             html += '<p class="fs-12">Average Score: <b>'+(resP.overallAverage||0)+'%</b></p>';
             html += '<p class="fs-12">Best Class: <b>'+(resP.bestClass||'N/A')+'</b></p>';
             html += '<p class="fs-12">Top Subject: <b>'+(resP.bestSubject||'N/A')+'</b></p></div></div>';
+            html += '<div class="aa-stat-card flex-1"><h6>Secondary School</h6><div class="mt-2">';
             html += '<p class="fs-12">Average Score: <b>'+(resH.overallAverage||0)+'%</b></p>';
             html += '<p class="fs-12">Best Class: <b>'+(resH.bestClass||'N/A')+'</b></p>';
             html += '<p class="fs-12">Top Subject: <b>'+(resH.bestSubject||'N/A')+'</b></p></div></div>';
             html += '</div>';
             document.getElementById('performance-summary').innerHTML = html;
           }, null, true);
+        }, null, true);
       } else {
         var section = (institutionType === 'secondary') ? 'high' : 'primary';
         callServer('adminGetSchoolPerformanceAnalytics', [AA.token, AA.settings.current_term, AA.settings.current_session, section], function(res) {
@@ -990,9 +993,10 @@
       }
       var container = document.getElementById('analytics-dynamic-container');
       
-      if (false) {
-        container.innerHTML = getAnalyticsHTML('primary', 'Primary School Analytics');
+      if (institutionType === 'both') {
+        container.innerHTML = getAnalyticsHTML('primary', 'Primary School Analytics') + '<div style="margin-top:20px;"></div>' + getAnalyticsHTML('high', 'Secondary School Analytics');
         fetchAndRenderAnalytics('primary');
+        setTimeout(function(){ fetchAndRenderAnalytics('high'); }, 500);
       } else {
         var section = (institutionType === 'secondary') ? 'high' : 'primary';
         container.innerHTML = getAnalyticsHTML(section, '');

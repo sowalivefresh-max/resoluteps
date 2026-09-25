@@ -1956,7 +1956,7 @@ function loadCommunications() {
   var tbody = document.querySelector('#communicationsTable tbody');
   if(tbody) tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-4"><i class="fa fa-spinner fa-spin"></i> Loading...</td></tr>';
   
-  var instType = typeof institutionType !== 'undefined' ? institutionType : (AA.settings.institution_type || 'primary');
+  var instType = typeof institutionType !== 'undefined' ? institutionType : (AA.settings.institution_type || 'both');
   callServer('adminGetAnnouncements', [AA.token, instType, AA.getActiveCampusId()], function(res) {
     if(!res.success) {
       if(tbody) tbody.innerHTML = '<tr><td colspan="4" class="text-center text-danger">'+(res.message || 'Error loading')+'</td></tr>';
@@ -2003,7 +2003,7 @@ function sendCommunication() {
   var form = document.getElementById('communicationForm');
   if(!form.checkValidity()) { form.reportValidity(); return; }
   
-  var instType = typeof institutionType !== 'undefined' ? institutionType : (AA.settings.institution_type || 'primary');
+  var instType = typeof institutionType !== 'undefined' ? institutionType : (AA.settings.institution_type || 'both');
   var payload = {
     targetAudience: form.targetAudience.value,
     targetClass: form.targetClass ? form.targetClass.value : '',
