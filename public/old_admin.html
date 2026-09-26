@@ -1270,7 +1270,7 @@
     function refreshGlobalData() {
       var cid = AA.getActiveCampusId();
       callServer('adminGetUsers', [AA.token, null, cid], function(u){ globalUsers = u; populateTeacherDropdowns(); populateCampusDropdowns(); });
-      callServer('adminGetClasses', [AA.token, null, cid], function(c){ globalClasses = c; populateClassDropdowns(); });
+      callServer('adminGetClasses', [AA.token, null, cid], function(c){ if(window.sortClassesArray) window.sortClassesArray(c); globalClasses = c; populateClassDropdowns(); });
       callServer('adminGetSubjects', [AA.token, null, cid], function(s){ globalSubjects = s; });
       callServer('adminGetStudents', [AA.token, null, cid], function(st){ globalStudents = st; });
     }
@@ -1304,11 +1304,11 @@
     }
 
     // Normalize section value to canonical form: 'high', 'primary', or 'both'
-    function normalizeSection(sec) {
+        function normalizeSection(sec) {
       var s = String(sec || '').toLowerCase().trim();
-      
-      if (s === 'primary' || s === 'primaryschool' || s === 'primary school') return 'primary';
-      return s; // 'both' or ''
+      if (s === 'high' || s === 'secondary' || s === 'secondaryschool' || s === 'secondary school') return 'high';
+      if (s === 'primary' || s === 'primaryschool' || s === 'primary school' || s === 'basic') return 'primary';
+      return 'both';
     }
 
     function populateClassDropdowns() {
@@ -1661,11 +1661,12 @@
     function loadClasses() {
       callServer('adminGetClasses', [AA.token], function(data) {
         
+        if(window.sortClassesArray) window.sortClassesArray(data);
         globalClasses = data;
         populateClassDropdowns();
         buildTable('classesTable', [
           { key: 'className' },
-          { key: 'section', render: function(r){ return normalizeSection(r.section) === 'high' ? 'High' : 'Primary'; } },
+          { key: 'section', render: function(r) { var sec = normalizeSection(r.section); if(sec === 'high') return 'Secondary'; if(sec === 'primary') return 'Primary'; return 'Both'; } },
           { key: 'classTeacherId', render: function(r){ 
              var tIds = r.classTeacherIds || (r.classTeacherId ? [r.classTeacherId] : (r.classTeacherID ? [r.classTeacherID] : []));
              if (tIds.length === 0) return 'None';
@@ -2502,7 +2503,7 @@
         globalSubjects = data;
         buildTable('subjectsTable', [
           { key: 'subjectName' },
-          { key: 'section', render: function(r){ return normalizeSection(r.section) === 'high' ? 'High' : 'Primary'; } },
+          { key: 'section', render: function(r) { var sec = normalizeSection(r.section); if(sec === 'high') return 'Secondary'; if(sec === 'primary') return 'Primary'; return 'Both'; } },
           { key: 'className', render: function(r){ return (r.className || r.class || 'All').split(',').join(', '); } },
           { key: 'assignedTeacherId', render: function(r){ 
              var tId = r.assignedTeacherId || r.assignedTeacherID;
