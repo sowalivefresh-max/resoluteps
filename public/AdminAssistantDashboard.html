@@ -1220,7 +1220,8 @@
         if (!AA.user || !AA.settings) return setTimeout(initDashboard, 100);
         
         if (AA.user.role === 'developer') {
-          document.getElementById('dev-controls').style.display = 'block';
+          var devCtrl = document.getElementById('dev-controls');
+          if (devCtrl) devCtrl.style.display = 'block';
         }
         
         if (AA.settings.subscription_expiry) {
@@ -1333,24 +1334,24 @@
       filteredClasses.sort(function(a, b) { return (a.className || '').localeCompare(b.className || '', undefined, {numeric: true, sensitivity: 'base'}); });
       var options = '<option value="">Select Class</option>';
       filteredClasses.forEach(function(c){ options += '<option value="'+c.className+'">'+c.className+'</option>'; });
-      document.getElementById('studentClassSelect').innerHTML = options;
-      document.getElementById('subjectClassSelect').innerHTML = '<option value="">All Classes</option>' + options;
+      var scs = document.getElementById('studentClassSelect'); if(scs) scs.innerHTML = options;
+      var subcs = document.getElementById('subjectClassSelect'); if(subcs) subcs.innerHTML = '<option value="">All Classes</option>' + options;
     }
 
     function loadDashboard() {
       callServer('adminGetStats', [AA.token], function(res) {
-        document.getElementById('stat-users').textContent = res.users;
-        document.getElementById('stat-students').textContent = res.students;
-        document.getElementById('stat-classes').textContent = res.classes;
-        document.getElementById('stat-subjects').textContent = res.subjects;
+        var su = document.getElementById('stat-users'); if(su) su.textContent = res.users;
+        var sst = document.getElementById('stat-students'); if(sst) sst.textContent = res.students;
+        var sc = document.getElementById('stat-classes'); if(sc) sc.textContent = res.classes;
+        var ss = document.getElementById('stat-subjects'); if(ss) ss.textContent = res.subjects;
       }, null, true);
       
       callServer('adminGetSettings', [AA.token], function(res) {
         var s = (res && res.data !== undefined) ? res.data : (res || {});
         currentTerm = s.current_term || '';
         currentSession = s.current_session || '';
-        document.getElementById('currentTermText').textContent = currentTerm + ' ' + currentSession;
-        if (s.school_name) document.getElementById('sb-school-name').textContent = s.school_name;
+        var ctt = document.getElementById('currentTermText'); if(ctt) ctt.textContent = currentTerm + ' ' + currentSession;
+        var sbs = document.getElementById('sb-school-name'); if(sbs && s.school_name) sbs.textContent = s.school_name;
 
         // --- Plan badge ---
         var planNames = { basic: 'Basic Plan', standard: 'Standard Plan', deluxe: 'Deluxe Plan' };
