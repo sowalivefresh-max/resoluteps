@@ -1621,7 +1621,7 @@
       // For single-section schools, the section dropdown is disabled and may not submit its value.
       // Force the correct section value based on institution type.
       if (!data.section || data.section === '') {
-        else if (institutionType === 'secondary') data.section = 'high';
+        if (institutionType === 'secondary') data.section = 'high';
         else if (institutionType === 'primary') data.section = 'primary';
         else data.section = 'both';
       }
