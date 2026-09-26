@@ -1,0 +1,153 @@
+[debug] [2026-09-26T05:57:49.587Z] ----------------------------------------------------------------------
+[debug] [2026-09-26T05:57:49.598Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\OASISFAITH\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js deploy --only hosting -m Implement custom class sorting order
+[debug] [2026-09-26T05:57:49.599Z] CLI Version:   15.24.0
+[debug] [2026-09-26T05:57:49.599Z] Platform:      win32
+[debug] [2026-09-26T05:57:49.599Z] Node Version:  v24.18.0
+[debug] [2026-09-26T05:57:49.599Z] Detected Agent: antigravity
+[debug] [2026-09-26T05:57:49.600Z] Time:          Sat Sep 26 2026 06:57:49 GMT+0100 (West Africa Time)
+[debug] [2026-09-26T05:57:49.600Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2026-09-26T05:57:54.308Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2026-09-26T05:57:54.309Z] > authorizing via signed-in user (faith4grtns@gmail.com)
+[debug] [2026-09-26T05:57:54.309Z] [iam] checking project resolute-92775 for permissions ["firebase.projects.get","firebasehosting.sites.update"]
+[debug] [2026-09-26T05:57:54.362Z] Checked if tokens are valid: true, expires at: 1790403994044
+[debug] [2026-09-26T05:57:54.362Z] Checked if tokens are valid: true, expires at: 1790403994044
+[debug] [2026-09-26T05:57:54.364Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/resolute-92775:testIamPermissions [none]
+[debug] [2026-09-26T05:57:54.365Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/resolute-92775:testIamPermissions  x-goog-user-project=resolute-92775
+[debug] [2026-09-26T05:57:54.365Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/resolute-92775:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2026-09-26T05:57:55.720Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/resolute-92775:testIamPermissions 200
+[debug] [2026-09-26T05:57:55.721Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/resolute-92775:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2026-09-26T05:57:55.723Z] Checked if tokens are valid: true, expires at: 1790403994044
+[debug] [2026-09-26T05:57:55.723Z] Checked if tokens are valid: true, expires at: 1790403994044
+[debug] [2026-09-26T05:57:55.724Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/resolute-92775 [none]
+[debug] [2026-09-26T05:57:58.323Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/resolute-92775 200
+[debug] [2026-09-26T05:57:58.323Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/resolute-92775 {"projectId":"resolute-92775","projectNumber":"823133932926","displayName":"Resolute","name":"projects/resolute-92775","resources":{"hostingSite":"resolute-92775"},"state":"ACTIVE","labels":{"firebase":"enabled"},"etag":"1_00a89d58-5621-473d-8802-92534a654c1e"}
+[info] 
+[info] === Deploying to 'resolute-92775'...
+[info] 
+[info] i  deploying hosting 
+[debug] [2026-09-26T05:57:58.336Z] Checked if tokens are valid: true, expires at: 1790403994044
+[debug] [2026-09-26T05:57:58.336Z] Checked if tokens are valid: true, expires at: 1790403994044
+[debug] [2026-09-26T05:57:58.337Z] >>> [apiv2][query] GET https://firebasehosting.googleapis.com/v1beta1/projects/resolute-92775/sites/resolute-92775 [none]
+[debug] [2026-09-26T05:58:02.219Z] <<< [apiv2][status] GET https://firebasehosting.googleapis.com/v1beta1/projects/resolute-92775/sites/resolute-92775 200
+[debug] [2026-09-26T05:58:02.220Z] <<< [apiv2][body] GET https://firebasehosting.googleapis.com/v1beta1/projects/resolute-92775/sites/resolute-92775 {"name":"projects/resolute-92775/sites/resolute-92775","defaultUrl":"https://resolute-92775.web.app","type":"DEFAULT_SITE"}
+[debug] [2026-09-26T05:58:02.232Z] Checked if tokens are valid: true, expires at: 1790403994044
+[debug] [2026-09-26T05:58:02.233Z] Checked if tokens are valid: true, expires at: 1790403994044
+[debug] [2026-09-26T05:58:02.237Z] >>> [apiv2][query] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/resolute-92775/versions [none]
+[debug] [2026-09-26T05:58:02.237Z] >>> [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/resolute-92775/versions {"status":"CREATED","labels":{"deployment-tool":"cli-firebase"}}
+[debug] [2026-09-26T05:58:04.512Z] <<< [apiv2][status] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/resolute-92775/versions 200
+[debug] [2026-09-26T05:58:04.513Z] <<< [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/resolute-92775/versions {"name":"projects/823133932926/sites/resolute-92775/versions/af3757852e43ebe8","status":"CREATED","config":{},"labels":{"deployment-tool":"cli-firebase"}}
+[info] i  hosting[resolute-92775]: beginning deploy... 
+[info] i  hosting[resolute-92775]: found 28 files in public 
+[debug] [2026-09-26T05:58:04.626Z] [hosting] uploading with 200 concurrency
+[debug] [2026-09-26T05:58:04.723Z] Checked if tokens are valid: true, expires at: 1790403994044
+[debug] [2026-09-26T05:58:04.724Z] Checked if tokens are valid: true, expires at: 1790403994044
+[debug] [2026-09-26T05:58:04.726Z] [hosting] hash cache [cHVibGlj] stored for 28 files
+[debug] [2026-09-26T05:58:04.726Z] [hosting][hash queue][FINAL] {"max":80,"min":2,"avg":11.892857142857142,"active":0,"complete":28,"success":28,"errored":0,"retried":0,"total":28,"elapsed":90}
+[debug] [2026-09-26T05:58:04.727Z] >>> [apiv2][query] POST https://firebasehosting.googleapis.com/v1beta1/projects/823133932926/sites/resolute-92775/versions/af3757852e43ebe8:populateFiles [none]
+[debug] [2026-09-26T05:58:04.727Z] >>> [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/823133932926/sites/resolute-92775/versions/af3757852e43ebe8:populateFiles {"files":{"/temp_script.js":"0f366898a54d7bd1710f019b812dc4651e0633e8b5655984ceb8a2da7a47edee","/TeacherDashboard.html":"2a07c954849f671326bb0592fae79d239330dc7cc996d61d0c13fe387a7fbdb2","/sw.js":"c30244a00321ee331468befef4a8f7678d03eb1e3ba7fc465f7ae74258818d68","/Subscription_Pricing_Proposal.html":"8b2e03e604c531a6362b754da87b95d4990474f406c906c863f86ab1bc9b30cc","/Styles.html":"39d89ba40e547464af2645b18c9e8868c30242d01e64be53ddd08cc15d837960","/styles.css":"930df29d3680876066ed519bc41e14b4386b41d437406f4676dc0bef5ae511b5","/StudentDashboard.html":"a35b8d34c0c268a6728f393eb26e7d6a879475ae58daa3ec03b736e901f49eb8","/StorekeeperDashboard.html":"0de35cc9b92e8287f36382a6095248dbcb793fd877e95b33f2c933abdc7bf932","/scripts.js":"779a4a67d55f64659ea9e13bf6b496363ba74ce92c585dda6682aa6b1c28acf4","/Scripts.html":"7c2375b13022649dcbd963256c5f6d711f9739a72b2b91980493a71a5662b518","/PrimaryTeacherDashboard.html":"7ebcce4ab937f2fb596cf992aabcd4627f05e70042e24b26038e83e56c33e1be","/ParentRegister.html":"b9d2b448ecb4ef3172891e2e265531214c33a0cdf4e8dda02f10118a71381bea","/ParentDashboard.html":"1fd49a7a1b86467aaaedb59d60aa021c8cc0028862d737e85b313331edc3804d","/NurseDashboard.html":"9110972359867f45902e7d83688580eed19c8430b8312351ac3f0ca8259f80f5","/manifest.json":"6d7e9df628d630ccc1c6c7d4a222de188317ce990b9a9888b79c70b720e0a752","/Login.html":"7935a178c101dbcbd7e1f2a3d0fecbb335d198451c9b764871ef38dabfb3ba66","/index.html":"383e5bc74eaff814805de88a39b7d369ac3146a4746fdbbe7a237a900b03fcfa","/icon.svg":"a28d198d3f4f169399e3c196703f675aabf3a997e1056a9ed457236863e413f0","/icon.png":"525ead5423e81c72ea267396a1881cdd32a6a12547dac1eef1c84b390933478d","/icon.jpeg":"9e6944fbc312652733565e6d73988a0ab1a45cc51a3458c4c79d040055fab2a9","/HeadTeacherDashboard.html":"3e8c1718310edcb04885391e0b519fdb7a92209e62cb887521c96bb7b03b931d","/Cloud_Deployment_Guide.html":"73c4ed45ae7b7b7f61904582605115e4acd74c81bf4f473a1fdd1dcc3441db42","/api.js":"d8fe9010b46d11e1dcb4a51533cf4826282177bea8027a6f2111e28822e442dd","/AccountsDashboard.html":"40e2147f208334785d4bda0d4692f1761d5f5a943092fef2fce03f6ebea92af4","/AdminAssistantDashboard.html":"5782c05db74b0c675dcda93874742db45c164e55041c306468c3ccccef3223b4","/AdminDashboard.html":"041ec194e4d3069bc485a68e70514e22b74e6ead161367a5a6cdec1a3f1d254e","/old_admin.html":"2b67bf802916b589b862d863c2d8456f274f724bc2cc4fe43cf8f28474481151","/DeveloperDashboard.html":"01c12d3b9689a600acb5f357177c6d99c0bd3ff5b1db12709be18522e9325768"}}
+[debug] [2026-09-26T05:58:05.821Z] <<< [apiv2][status] POST https://firebasehosting.googleapis.com/v1beta1/projects/823133932926/sites/resolute-92775/versions/af3757852e43ebe8:populateFiles 200
+[debug] [2026-09-26T05:58:05.821Z] <<< [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/823133932926/sites/resolute-92775/versions/af3757852e43ebe8:populateFiles {"uploadRequiredHashes":["2b67bf802916b589b862d863c2d8456f274f724bc2cc4fe43cf8f28474481151","5782c05db74b0c675dcda93874742db45c164e55041c306468c3ccccef3223b4","01c12d3b9689a600acb5f357177c6d99c0bd3ff5b1db12709be18522e9325768","041ec194e4d3069bc485a68e70514e22b74e6ead161367a5a6cdec1a3f1d254e"],"uploadUrl":"https://upload-firebasehosting.googleapis.com/upload/sites/resolute-92775/versions/af3757852e43ebe8/files"}
+[debug] [2026-09-26T05:58:05.822Z] Checked if tokens are valid: true, expires at: 1790403994044
+[debug] [2026-09-26T05:58:05.822Z] Checked if tokens are valid: true, expires at: 1790403994044
+[debug] [2026-09-26T05:58:05.823Z] Checked if tokens are valid: true, expires at: 1790403994044
+[debug] [2026-09-26T05:58:05.823Z] Checked if tokens are valid: true, expires at: 1790403994044
+[debug] [2026-09-26T05:58:05.824Z] Checked if tokens are valid: true, expires at: 1790403994044
+[debug] [2026-09-26T05:58:05.824Z] Checked if tokens are valid: true, expires at: 1790403994044
+[debug] [2026-09-26T05:58:05.824Z] Checked if tokens are valid: true, expires at: 1790403994044
+[debug] [2026-09-26T05:58:05.824Z] Checked if tokens are valid: true, expires at: 1790403994044
+[debug] [2026-09-26T05:58:05.825Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/resolute-92775/versions/af3757852e43ebe8/files/2b67bf802916b589b862d863c2d8456f274f724bc2cc4fe43cf8f28474481151 [none]
+[debug] [2026-09-26T05:58:05.825Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/resolute-92775/versions/af3757852e43ebe8/files/2b67bf802916b589b862d863c2d8456f274f724bc2cc4fe43cf8f28474481151 [stream]
+[debug] [2026-09-26T05:58:05.827Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/resolute-92775/versions/af3757852e43ebe8/files/5782c05db74b0c675dcda93874742db45c164e55041c306468c3ccccef3223b4 [none]
+[debug] [2026-09-26T05:58:05.828Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/resolute-92775/versions/af3757852e43ebe8/files/5782c05db74b0c675dcda93874742db45c164e55041c306468c3ccccef3223b4 [stream]
+[debug] [2026-09-26T05:58:05.829Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/resolute-92775/versions/af3757852e43ebe8/files/01c12d3b9689a600acb5f357177c6d99c0bd3ff5b1db12709be18522e9325768 [none]
+[debug] [2026-09-26T05:58:05.829Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/resolute-92775/versions/af3757852e43ebe8/files/01c12d3b9689a600acb5f357177c6d99c0bd3ff5b1db12709be18522e9325768 [stream]
+[debug] [2026-09-26T05:58:05.831Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/resolute-92775/versions/af3757852e43ebe8/files/041ec194e4d3069bc485a68e70514e22b74e6ead161367a5a6cdec1a3f1d254e [none]
+[debug] [2026-09-26T05:58:05.831Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/resolute-92775/versions/af3757852e43ebe8/files/041ec194e4d3069bc485a68e70514e22b74e6ead161367a5a6cdec1a3f1d254e [stream]
+[debug] [2026-09-26T05:58:05.840Z] [hosting][populate queue][FINAL] {"max":1102,"min":1102,"avg":1102,"active":0,"complete":1,"success":1,"errored":0,"retried":0,"total":1,"elapsed":1117}
+[debug] [2026-09-26T05:58:05.840Z] [hosting] uploads queued: 4
+[info] i  hosting: uploading new files [0/4] (0%) 
+[info] i  hosting: uploading new files [0/4] (0%) 
+[info] i  hosting: uploading new files [0/4] (0%) 
+[info] i  hosting: uploading new files [0/4] (0%) 
+[info] i  hosting: uploading new files [0/4] (0%) 
+[info] i  hosting: uploading new files [0/4] (0%) 
+[info] i  hosting: uploading new files [0/4] (0%) 
+[debug] [2026-09-26T05:58:20.308Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/resolute-92775/versions/af3757852e43ebe8/files/5782c05db74b0c675dcda93874742db45c164e55041c306468c3ccccef3223b4 200
+[debug] [2026-09-26T05:58:20.309Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/resolute-92775/versions/af3757852e43ebe8/files/5782c05db74b0c675dcda93874742db45c164e55041c306468c3ccccef3223b4 [stream]
+[debug] [2026-09-26T05:58:20.590Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/resolute-92775/versions/af3757852e43ebe8/files/01c12d3b9689a600acb5f357177c6d99c0bd3ff5b1db12709be18522e9325768 200
+[debug] [2026-09-26T05:58:20.591Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/resolute-92775/versions/af3757852e43ebe8/files/01c12d3b9689a600acb5f357177c6d99c0bd3ff5b1db12709be18522e9325768 [stream]
+[info] i  hosting: uploading new files [2/4] (50%) 
+[debug] [2026-09-26T05:58:20.700Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/resolute-92775/versions/af3757852e43ebe8/files/041ec194e4d3069bc485a68e70514e22b74e6ead161367a5a6cdec1a3f1d254e 200
+[debug] [2026-09-26T05:58:20.701Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/resolute-92775/versions/af3757852e43ebe8/files/041ec194e4d3069bc485a68e70514e22b74e6ead161367a5a6cdec1a3f1d254e [stream]
+[debug] [2026-09-26T05:58:20.960Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/resolute-92775/versions/af3757852e43ebe8/files/2b67bf802916b589b862d863c2d8456f274f724bc2cc4fe43cf8f28474481151 200
+[debug] [2026-09-26T05:58:20.961Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/resolute-92775/versions/af3757852e43ebe8/files/2b67bf802916b589b862d863c2d8456f274f724bc2cc4fe43cf8f28474481151 [stream]
+[debug] [2026-09-26T05:58:20.962Z] [hosting][upload queue][FINAL] {"max":15141,"min":14486,"avg":14818,"active":0,"complete":4,"success":4,"errored":0,"retried":0,"total":4,"elapsed":15141}
+[info] i  hosting: upload complete 
+[info] +  hosting[resolute-92775]: file upload complete 
+[debug] [2026-09-26T05:58:20.964Z] [hosting] deploy completed after 16439ms
+[debug] [2026-09-26T05:58:20.965Z] [
+  {
+    "config": {
+      "public": "public",
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "**/node_modules/**"
+      ],
+      "rewrites": [
+        {
+          "source": "/api",
+          "function": {
+            "functionId": "api"
+          }
+        },
+        {
+          "source": "**",
+          "destination": "/index.html"
+        }
+      ],
+      "site": "resolute-92775"
+    },
+    "version": "projects/823133932926/sites/resolute-92775/versions/af3757852e43ebe8"
+  }
+]
+[info] i  hosting[resolute-92775]: finalizing version... 
+[debug] [2026-09-26T05:58:20.973Z] Checked if tokens are valid: true, expires at: 1790403994044
+[debug] [2026-09-26T05:58:20.973Z] Checked if tokens are valid: true, expires at: 1790403994044
+[debug] [2026-09-26T05:58:20.974Z] >>> [apiv2][query] GET https://cloudfunctions.googleapis.com/v1/projects/resolute-92775/locations/-/functions [none]
+[debug] [2026-09-26T05:58:22.127Z] <<< [apiv2][status] GET https://cloudfunctions.googleapis.com/v1/projects/resolute-92775/locations/-/functions 200
+[debug] [2026-09-26T05:58:22.128Z] <<< [apiv2][body] GET https://cloudfunctions.googleapis.com/v1/projects/resolute-92775/locations/-/functions {}
+[debug] [2026-09-26T05:58:22.129Z] Checked if tokens are valid: true, expires at: 1790403994044
+[debug] [2026-09-26T05:58:22.129Z] Checked if tokens are valid: true, expires at: 1790403994044
+[debug] [2026-09-26T05:58:22.157Z] >>> [apiv2][query] GET https://cloudfunctions.googleapis.com/v2/projects/resolute-92775/locations/-/functions filter=environment%3D%22GEN_2%22
+[debug] [2026-09-26T05:58:29.489Z] <<< [apiv2][status] GET https://cloudfunctions.googleapis.com/v2/projects/resolute-92775/locations/-/functions 200
+[debug] [2026-09-26T05:58:29.490Z] <<< [apiv2][body] GET https://cloudfunctions.googleapis.com/v2/projects/resolute-92775/locations/-/functions {"functions":[{"name":"projects/resolute-92775/locations/us-central1/functions/api","buildConfig":{"build":"projects/823133932926/locations/us-central1/builds/c909edb4-0e32-4a27-9ca1-fda1ee904ed0","runtime":"nodejs22","entryPoint":"api","source":{"storageSource":{"bucket":"gcf-v2-sources-823133932926-us-central1","object":"api/function-source.zip","generation":"1790361276729572"}},"environmentVariables":{"GOOGLE_NODE_RUN_SCRIPTS":""},"dockerRepository":"projects/resolute-92775/locations/us-central1/repositories/gcf-artifacts","sourceProvenance":{"resolvedStorageSource":{"bucket":"gcf-v2-sources-823133932926-us-central1","object":"api/function-source.zip","generation":"1790361276729572"}},"dockerRegistry":"ARTIFACT_REGISTRY","serviceAccount":"projects/resolute-92775/serviceAccounts/823133932926-compute@developer.gserviceaccount.com","automaticUpdatePolicy":{}},"serviceConfig":{"service":"projects/resolute-92775/locations/us-central1/services/api","timeoutSeconds":60,"environmentVariables":{"FIREBASE_CONFIG":"{\"projectId\":\"resolute-92775\",\"storageBucket\":\"resolute-92775.firebasestorage.app\"}","GCLOUD_PROJECT":"resolute-92775","EVENTARC_CLOUD_EVENT_SOURCE":"projects/resolute-92775/locations/us-central1/services/api","FUNCTION_TARGET":"api","LOG_EXECUTION_ID":"true"},"maxInstanceCount":20,"ingressSettings":"ALLOW_ALL","uri":"https://api-v3qs35mx5a-uc.a.run.app","serviceAccountEmail":"823133932926-compute@developer.gserviceaccount.com","availableMemory":"256Mi","allTrafficOnLatestRevision":true,"revision":"api-00005-kim","maxInstanceRequestConcurrency":80,"availableCpu":"1"},"state":"ACTIVE","updateTime":"2026-09-25T18:35:22.707958344Z","labels":{"deployment-tool":"cli-firebase","firebase-functions-hash":"fc160ce5873e3e7236e8e498c20dd8d4f5e7f02a"},"environment":"GEN_2","url":"https://us-central1-resolute-92775.cloudfunctions.net/api","createTime":"2026-09-11T12:59:12.158312137Z","satisfiesPzi":true}]}
+[debug] [2026-09-26T05:58:29.497Z] Checked if tokens are valid: true, expires at: 1790403994044
+[debug] [2026-09-26T05:58:29.498Z] Checked if tokens are valid: true, expires at: 1790403994044
+[debug] [2026-09-26T05:58:29.498Z] >>> [apiv2][query] PATCH https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/resolute-92775/versions/af3757852e43ebe8 updateMask=status%2Cconfig
+[debug] [2026-09-26T05:58:29.499Z] >>> [apiv2][body] PATCH https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/resolute-92775/versions/af3757852e43ebe8 {"status":"FINALIZED","config":{"rewrites":[{"glob":"/api","run":{"serviceId":"api","region":"us-central1"}},{"glob":"**","path":"/index.html"}]}}
+[debug] [2026-09-26T05:58:34.406Z] <<< [apiv2][status] PATCH https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/resolute-92775/versions/af3757852e43ebe8 200
+[debug] [2026-09-26T05:58:34.406Z] <<< [apiv2][body] PATCH https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/resolute-92775/versions/af3757852e43ebe8 {"name":"projects/823133932926/sites/resolute-92775/versions/af3757852e43ebe8","status":"FINALIZED","config":{"rewrites":[{"glob":"/api","run":{"serviceId":"api","region":"us-central1"}},{"glob":"**","path":"/index.html"}]},"labels":{"deployment-tool":"cli-firebase"},"createTime":"2026-09-26T05:58:02.304023Z","createUser":{"email":"faith4grtns@gmail.com"},"finalizeTime":"2026-09-26T05:58:33.326282Z","finalizeUser":{"email":"faith4grtns@gmail.com"}}
+[debug] [2026-09-26T05:58:34.406Z] [hosting] finalized version for resolute-92775:[object Object]
+[info] +  hosting[resolute-92775]: version finalized 
+[info] i  hosting[resolute-92775]: releasing new version... 
+[debug] [2026-09-26T05:58:34.407Z] Checked if tokens are valid: true, expires at: 1790403994044
+[debug] [2026-09-26T05:58:34.408Z] Checked if tokens are valid: true, expires at: 1790403994044
+[debug] [2026-09-26T05:58:34.408Z] >>> [apiv2][query] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/resolute-92775/channels/live/releases versionName=projects%2F823133932926%2Fsites%2Fresolute-92775%2Fversions%2Faf3757852e43ebe8
+[debug] [2026-09-26T05:58:34.408Z] >>> [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/resolute-92775/channels/live/releases {"message":"Implement custom class sorting order"}
+[debug] [2026-09-26T05:58:36.410Z] <<< [apiv2][status] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/resolute-92775/channels/live/releases 200
+[debug] [2026-09-26T05:58:36.411Z] <<< [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/resolute-92775/channels/live/releases {"name":"projects/823133932926/sites/resolute-92775/channels/live/releases/1790402314337000","version":{"name":"projects/823133932926/sites/resolute-92775/versions/af3757852e43ebe8","status":"FINALIZED","config":{"rewrites":[{"glob":"/api","run":{"serviceId":"api","region":"us-central1"}},{"glob":"**","path":"/index.html"}]},"labels":{"deployment-tool":"cli-firebase"},"createTime":"2026-09-26T05:58:02.304023Z","createUser":{"email":"faith4grtns@gmail.com","imageUrl":"https://lh3.googleusercontent.com/a/ACg8ocLEYSCpC6QXxVI9ZrrPgzBbqLjliRa8FdJMXeDFQunkfwEXvFN7"},"finalizeTime":"2026-09-26T05:58:33.326282Z","finalizeUser":{"email":"faith4grtns@gmail.com","imageUrl":"https://lh3.googleusercontent.com/a/ACg8ocLEYSCpC6QXxVI9ZrrPgzBbqLjliRa8FdJMXeDFQunkfwEXvFN7"}},"type":"DEPLOY","releaseTime":"2026-09-26T05:58:34.337Z","message":"Implement custom class sorting order","releaseUser":{"email":"faith4grtns@gmail.com","imageUrl":"https://lh3.googleusercontent.com/a/ACg8ocLEYSCpC6QXxVI9ZrrPgzBbqLjliRa8FdJMXeDFQunkfwEXvFN7"}}
+[debug] [2026-09-26T05:58:36.411Z] [hosting] release: Implement custom class sorting order {"name":"projects/823133932926/sites/resolute-92775/channels/live/releases/1790402314337000","version":{"name":"projects/823133932926/sites/resolute-92775/versions/af3757852e43ebe8","status":"FINALIZED","config":{"rewrites":[{"glob":"/api","run":{"serviceId":"api","region":"us-central1"}},{"glob":"**","path":"/index.html"}]},"labels":{"deployment-tool":"cli-firebase"},"createTime":"2026-09-26T05:58:02.304023Z","createUser":{"email":"faith4grtns@gmail.com","imageUrl":"https://lh3.googleusercontent.com/a/ACg8ocLEYSCpC6QXxVI9ZrrPgzBbqLjliRa8FdJMXeDFQunkfwEXvFN7"},"finalizeTime":"2026-09-26T05:58:33.326282Z","finalizeUser":{"email":"faith4grtns@gmail.com","imageUrl":"https://lh3.googleusercontent.com/a/ACg8ocLEYSCpC6QXxVI9ZrrPgzBbqLjliRa8FdJMXeDFQunkfwEXvFN7"}},"type":"DEPLOY","releaseTime":"2026-09-26T05:58:34.337Z","message":"Implement custom class sorting order","releaseUser":{"email":"faith4grtns@gmail.com","imageUrl":"https://lh3.googleusercontent.com/a/ACg8ocLEYSCpC6QXxVI9ZrrPgzBbqLjliRa8FdJMXeDFQunkfwEXvFN7"}}
+[info] +  hosting[resolute-92775]: release complete 
+[info] 
+[info] +  Deploy complete! 
+[info] 
+[info] Project Console: https://console.firebase.google.com/project/resolute-92775/overview
+[info] Hosting URL: https://resolute-92775.web.app
+[debug] [2026-09-26T05:58:43.624Z] Error: Timed out.
+    at Timeout.<anonymous> (C:\Users\OASISFAITH\AppData\Roaming\npm\node_modules\firebase-tools\lib\utils.js:296:49)
+    at listOnTimeout (node:internal/timers:605:17)
+    at process.processTimers (node:internal/timers:541:7)
+[error] 
+[error] Error: An unexpected error has occurred.

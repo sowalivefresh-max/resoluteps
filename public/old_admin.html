@@ -1318,7 +1318,17 @@
         else if (institutionType === 'secondary') return sec === 'high' || !sec;
         return true;
       });
-      filteredClasses.sort(function(a, b) { return (a.className || '').localeCompare(b.className || '', undefined, {numeric: true, sensitivity: 'base'}); });
+      var classOrder = ["reception", "kg1", "kg 1", "kg2", "kg 2", "nursery class", "nursery", "basic 1", "basic 2", "basic 3", "basic 4", "basic 5", "jss1", "jss 1", "jss2", "jss 2", "jss3", "jss 3", "sss1", "sss 1", "sss2", "sss 2", "sss3", "sss 3"];
+      filteredClasses.sort(function(a, b) {
+        var nameA = String(a.className || '').toLowerCase().trim();
+        var nameB = String(b.className || '').toLowerCase().trim();
+        var idxA = classOrder.indexOf(nameA);
+        var idxB = classOrder.indexOf(nameB);
+        if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+        if (idxA !== -1) return -1;
+        if (idxB !== -1) return 1;
+        return nameA.localeCompare(nameB, undefined, {numeric: true, sensitivity: 'base'});
+      });
       var options = '<option value="">Select Class</option>';
       filteredClasses.forEach(function(c){ options += '<option value="'+c.className+'">'+c.className+'</option>'; });
       var scs = document.getElementById('studentClassSelect'); if(scs) scs.innerHTML = options;
@@ -2528,7 +2538,17 @@
         var cSec = normalizeSection(c.section);
         return cSec === sec || !cSec;
       });
-      filteredClasses.sort(function(a, b) { return (a.className || '').localeCompare(b.className || '', undefined, {numeric: true, sensitivity: 'base'}); });
+      var classOrder = ["reception", "kg1", "kg 1", "kg2", "kg 2", "nursery class", "nursery", "basic 1", "basic 2", "basic 3", "basic 4", "basic 5", "jss1", "jss 1", "jss2", "jss 2", "jss3", "jss 3", "sss1", "sss 1", "sss2", "sss 2", "sss3", "sss 3"];
+      filteredClasses.sort(function(a, b) {
+        var nameA = String(a.className || '').toLowerCase().trim();
+        var nameB = String(b.className || '').toLowerCase().trim();
+        var idxA = classOrder.indexOf(nameA);
+        var idxB = classOrder.indexOf(nameB);
+        if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+        if (idxA !== -1) return -1;
+        if (idxB !== -1) return 1;
+        return nameA.localeCompare(nameB, undefined, {numeric: true, sensitivity: 'base'});
+      });
       var options = '<option value="">All Classes</option>';
       filteredClasses.forEach(function(c){ options += '<option value="'+c.className+'">'+c.className+'</option>'; });
       document.getElementById('subjectClassSelect').innerHTML = options;
